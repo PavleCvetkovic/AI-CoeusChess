@@ -8,8 +8,16 @@ namespace ChessTG
 {
     public class Potez
     {
+        #region Attributes
         Context c;
         public int x, y;
+
+        public int Value { get; set; }
+
+        #endregion
+
+        #region Constructors
+
         public Potez()
         {
             x = 0;
@@ -20,6 +28,11 @@ namespace ChessTG
             this.x = x;
             this.y = y;
         }
+
+        #endregion
+
+        #region Methods
+
         public bool UGranicama()
         {
             if (x < 8 && x >= 0 && y < 8 && y >= 0)
@@ -71,7 +84,8 @@ namespace ChessTG
             }
             return false;
         }
-      
+
+        //nisam koristio
         public bool DalijeNapadnut(Context c,Tip t,Potez p)
         {
             List<Potez> lista = new List<Potez>();
@@ -107,5 +121,25 @@ namespace ChessTG
             }
             return false;
        }
+
+        //potrebno zbog uporedjivanja poteza
+        public override bool Equals(object obj)
+        {
+            var item = obj as Potez;
+
+            if (item == null)
+                return false;
+
+            return this.x == item.x && this.y == item.y;
+        }
+
+        //takodje potrebno
+        public override int GetHashCode()
+        {
+            int hash = 5;
+            return hash * (x + y);
+        }
+
+        #endregion
     }
 }

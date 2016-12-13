@@ -8,8 +8,12 @@ namespace ChessTG
 {
     public class Tabla
     {
+        #region Attributes
         public int[,] matrica;
         public int pobedio;
+        #endregion
+
+        #region Constructors
         public Tabla()
         {
             matrica = new int[8, 8];
@@ -24,6 +28,8 @@ namespace ChessTG
                 for (int j = 0; j < 8; j++)
                     matrica[i, j] = t.matrica[i, j];
         }
+        #endregion
+
         /// <summary>
         /// vraca polje iz matrice
         /// </summary>
@@ -34,6 +40,7 @@ namespace ChessTG
                 return matrica[x, y];
             return 0;
         }
+
         /// <summary>
         /// Vraca listu svih slobodnih polja na tabli
         /// </summary>
