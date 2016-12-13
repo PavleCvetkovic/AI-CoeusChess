@@ -67,7 +67,7 @@ namespace ChessTG
         }
 
         /// <summary>
-        ///  Kreira konacnu listu mogucih poteza koje figura moze odigradi
+        ///  Kreira konacnu listu mogucih poteza koje figura moze odigrati
         /// </summary>
         /// <param name="ctx"></param>
         /// <param name="trenutneKoordinate"></param>
