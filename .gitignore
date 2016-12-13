@@ -1,0 +1,5 @@
+*.exe
+ChessTG/ChessTG/bin
+ChessTG/ChessTG/bin/*
+ChessTG/ChessTG/obj
+ChessTG/ChessTG/obj/*
