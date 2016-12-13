@@ -31,3 +31,13 @@ D:\Codes, Books & Stuff\ChessTG2\ChessTG\obj\Debug\ChessTG.csproj.GenerateResour
 C:\Users\student\Downloads\ChessTG2\ChessTG\bin\Debug\ChessTG.exe.config
 C:\Users\student\Downloads\ChessTG2\ChessTG\obj\Debug\ChessTG.exe
 C:\Users\student\Downloads\ChessTG2\ChessTG\obj\Debug\ChessTG.pdb
+C:\Users\Pavle\Documents\GitHub\CoeusChess\ChessTG\ChessTG\bin\Debug\ChessTG.exe.config
+C:\Users\Pavle\Documents\GitHub\CoeusChess\ChessTG\ChessTG\obj\Debug\ChessTG.exe
+C:\Users\Pavle\Documents\GitHub\CoeusChess\ChessTG\ChessTG\obj\Debug\ChessTG.pdb
+C:\Users\Pavle\Documents\GitHub\CoeusChess\ChessTG\ChessTG\bin\Debug\ChessTG.exe
+C:\Users\Pavle\Documents\GitHub\CoeusChess\ChessTG\ChessTG\bin\Debug\ChessTG.pdb
+C:\Users\Pavle\Documents\GitHub\CoeusChess\ChessTG\ChessTG\obj\Debug\ChessTG.csprojResolveAssemblyReference.cache
+C:\Users\Pavle\Documents\GitHub\CoeusChess\ChessTG\ChessTG\obj\Debug\ChessTG.Dodaj.resources
+C:\Users\Pavle\Documents\GitHub\CoeusChess\ChessTG\ChessTG\obj\Debug\ChessTG.Form1.resources
+C:\Users\Pavle\Documents\GitHub\CoeusChess\ChessTG\ChessTG\obj\Debug\ChessTG.Properties.Resources.resources
+C:\Users\Pavle\Documents\GitHub\CoeusChess\ChessTG\ChessTG\obj\Debug\ChessTG.csproj.GenerateResource.Cache
