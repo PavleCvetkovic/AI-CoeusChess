@@ -81,11 +81,12 @@ namespace ChessTG
             if (i % 2 != 0)//ako se klikne na prazno "i" ostaje 0
             {
                 pocetneKoordinate = new Potez((int.Parse((int.Parse(b.Tag.ToString()) / 10).ToString())), (int.Parse((int.Parse(b.Tag.ToString()) % 10).ToString())));
-                listaMogucihPoteza = kontekst.listaMogucihPoteza((Tip)kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y], pocetneKoordinate);
+                listaMogucihPoteza = kontekst.FinalnaListaMogucihPoteza(kontekst, pocetneKoordinate);
                 if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 0)
                     i--;
                 else
                 {
+                    //proverava da li je odgovarajuci igrac na potezu
                     if ((kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 2 || kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 3) && kontekst.naPotezu == 1)
                         i--;
                     if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 1 && kontekst.naPotezu == 2)
@@ -98,9 +99,10 @@ namespace ChessTG
                 odredisneKoordinate= new Potez((int.Parse((int.Parse(b.Tag.ToString()) / 10).ToString())), (int.Parse((int.Parse(b.Tag.ToString()) % 10).ToString())));
                 foreach(Potez p in listaMogucihPoteza)
                 {
-                    if (p.x == odredisneKoordinate.x && p.y == odredisneKoordinate.y)
+                    if (p.Equals(odredisneKoordinate))  //(p.x == odredisneKoordinate.x && p.y == odredisneKoordinate.y)
                         sadrzi = true;
                 }
+                /*
                 if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] != 3)
                 {
                     if (!odredisneKoordinate.DalijeNapadnut(kontekst, (Tip)kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y], odredisneKoordinate))
@@ -111,13 +113,13 @@ namespace ChessTG
                         }
                 }
                 else
-                {
+                { */
                     if (sadrzi)
                     {
                         kontekst.UradiPotez(pocetneKoordinate, odredisneKoordinate);
                        // kontekst.naPotezu = kontekst.naPotezu ^ 3;
                     }
-                }
+                //}
                 Refresh();
             }
             i++;
