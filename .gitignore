@@ -4,3 +4,7 @@ ChessTG/ChessTG/bin/*
 ChessTG/ChessTG/obj
 ChessTG/ChessTG/obj/*
 ChessTG/.vs/ChessTG/v14/.suo
+*.exe
+ChessTG/ChessTG/bin/Debug/ChessTG.pdb
+*.exe
+*.Cache
