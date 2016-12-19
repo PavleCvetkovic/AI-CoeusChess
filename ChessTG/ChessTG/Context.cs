@@ -47,7 +47,7 @@ namespace ChessTG
 
         #region ListePoteza
         /// <summary>
-        /// Vraca listu mogucih poteza za figuru
+        /// Vraca listu svih mogucih poteza za figuru(sa potencijalno napadnutim poljima, ne filtira je)
         /// </summary>
         /// <param name="f"></param>
         /// <returns></returns>
@@ -67,7 +67,7 @@ namespace ChessTG
         }
 
         /// <summary>
-        ///  Kreira konacnu listu mogucih poteza koje figura moze odigradi
+        ///  Kreira konacnu listu mogucih poteza koje figura moze odigrati
         /// </summary>
         /// <param name="ctx"></param>
         /// <param name="trenutneKoordinate"></param>
