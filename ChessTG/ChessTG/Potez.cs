@@ -9,7 +9,8 @@ namespace ChessTG
     public class Potez
     {
         #region Attributes
-        Context c;
+        //stavio sam da bude property umesto atributa
+        public Context StanjeTable { get; set;} 
         public int x, y;
 
         public int Value { get; set; }
