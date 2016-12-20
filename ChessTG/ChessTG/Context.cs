@@ -58,10 +58,13 @@ namespace ChessTG
             lista = Stanje.listaSlobodnihPolja();
             foreach(Potez p in lista)
             {
-                
-                    if (p.UGranicama())
-                        if (p.DaLiJeValidan(tip,trenutneKoordinate))
-                            listaZaVracanje.Add(p);
+
+                if (p.UGranicama())
+                    if (p.DaLiJeValidan(tip, trenutneKoordinate))
+                    {
+                        p.tipFigure = tip;
+                        listaZaVracanje.Add(p);
+                    }
             }
             return listaZaVracanje;
         }
@@ -184,13 +187,110 @@ namespace ChessTG
         //skoro gotova
         //prilikom rekurzivnog poziva treba da se poziva za naredno stanje
         //treba da se testira 
-        public Potez AlphaBeta(Context ctx, int depth, int alpha, int beta)
-        { 
+        public Potez AlphaBeta(Context ctx, int depth, int alpha, int beta,Potez trenutnoMesto)
+        {
+            //-------------------------------
+            Context zaProsledjivanje = new Context();
+            zaProsledjivanje = ctx;
+            List<Potez> listaPoteza = new List<Potez>();
+            List<Potez> listaKralja = new List<Potez>();
+            List<Potez> listaTopa = new List<Potez>();
+            Koordinate beliKralj = NadjiFiguru(Tip.BeliKralj, ctx);
+            Koordinate beliTop = NadjiFiguru(Tip.BeliTop, ctx);
+            Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, ctx);
+            if (ctx.naPotezu == (int)Igra.Beli)
+            {
+                if (trenutnoMesto == null)
+                {
+                    listaKralja = FinalnaListaMogucihPoteza(ctx, new Potez(beliKralj.x, beliKralj.y));
+                    listaPoteza.AddRange(listaKralja);
+                    listaTopa = FinalnaListaMogucihPoteza(ctx, new Potez(beliTop.x, beliTop.y));
+                    listaPoteza.AddRange(listaTopa);
+                }else
+                {
+                    if(ctx.Stanje.matrica[trenutnoMesto.x,trenutnoMesto.y]==(int)Tip.BeliKralj)
+                    {
+                        listaKralja = FinalnaListaMogucihPoteza(ctx, new Potez(beliKralj.x, beliKralj.y));
+                        listaPoteza.AddRange(listaKralja);
+                    }else
+                    {
+                        listaTopa = FinalnaListaMogucihPoteza(ctx, new Potez(beliTop.x, beliTop.y));
+                        listaPoteza.AddRange(listaTopa);
+                    }
+                }
+            }
+            else
+            {
+                listaPoteza.AddRange(FinalnaListaMogucihPoteza(ctx,
+                    new Potez(crniKralj.x, crniKralj.y)));
+            }
+
+            Potez najbolji = new Potez(); //ovaj potez vraca funkcija
+            Potez pom = new Potez();
+
+
+            if (depth == 0 || ctx.DaLiJeKraj())
+            {
+                najbolji.Value = ctx.Evaluate();
+                return najbolji;
+            }
+
+            int v;
+
+            if (ctx.naPotezu == (int)Igra.Beli)
+            {
+                v = int.MinValue;
+                foreach (Potez pot in listaPoteza)
+                {
+                    if (trenutnoMesto == null)
+                    {
+                        if (listaKralja.Contains(pot))
+                            trenutnoMesto = new Potez(beliKralj.x, beliKralj.y);
+                        else
+                            trenutnoMesto = new Potez(beliTop.x, beliTop.y);
+                    }
+                    zaProsledjivanje.UradiPotez(trenutnoMesto,pot);
+                    pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta,pot);
+                    if (v < pom.Value)
+                    {
+                        v = pom.Value;
+                        najbolji = pot;
+                        najbolji.Value = v;
+                        alpha = Math.Max(alpha, v);
+                    }
+                    if (beta <= alpha)
+                        break;
+                }
+
+            }
+            else
+            {
+                v = int.MaxValue;
+                foreach (Potez pot in listaPoteza)
+                {
+                    zaProsledjivanje.UradiPotez(new Potez(crniKralj.x,crniKralj.y), pot);
+                    pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta, pot);
+                    if (v > pom.Value)
+                    {
+                        v = pom.Value;
+                        najbolji = pot;
+                        najbolji.Value = v;
+                        beta = Math.Min(beta, v);
+                    }
+                    if (beta >= alpha)
+                    {
+                        break;
+                    }
+                }
+            }
+
+
+
+            //--------------------------------
             //lista poteza za onog ko je na potezu
-            List<Potez> listaPoteza = new List<Potez>(); 
+           /* List<Potez> listaPoteza = new List<Potez>(); 
             if (ctx.naPotezu == (int) Igra.Beli)
             {
-                //List<Koordinate> beleFigure = NadjiFigure()
                 Koordinate beliKralj = NadjiFiguru(Tip.BeliKralj, ctx);
                 Koordinate beliTop = NadjiFiguru(Tip.BeliTop, ctx);
                 listaPoteza.AddRange(FinalnaListaMogucihPoteza(ctx,
@@ -212,7 +312,7 @@ namespace ChessTG
                 najbolji.Value = ctx.Evaluate();
                 return najbolji;
             }
-
+            
             int v;
 
             if (ctx.naPotezu == (int)Igra.Beli)
@@ -220,8 +320,10 @@ namespace ChessTG
                 v = int.MinValue;
                 foreach (Potez pot in listaPoteza)
                 {
-                    pom = AlphaBeta(/*treba naredno, a ne trenutno stanje*/pot.StanjeTable, depth - 1, alpha, beta);
-                    if (v < pom.Value)
+                    pom = AlphaBeta(pot.StanjeTable, depth - 1, alpha, beta);
+
+
+            if (v < pom.Value)
                     {
                         v = pom.Value;
                         najbolji = pot;
@@ -238,7 +340,7 @@ namespace ChessTG
                 v = int.MaxValue;
                 foreach (Potez pot in listaPoteza)
                 {
-                    pom = AlphaBeta( /*treba naredno, a ne trenutno stanje*/pot.StanjeTable, depth - 1, alpha, beta);
+                    pom = AlphaBeta(pot.StanjeTable, depth - 1, alpha, beta);
                     if (v > pom.Value)
                     {
                         v = pom.Value;
@@ -252,13 +354,26 @@ namespace ChessTG
                     }
                 }
             }
+            */
 
             return najbolji;
         }
 
         public int Evaluate()
         {
-            throw new NotImplementedException();
+            if (DaLiJeKraj())
+                return 10000;
+            List<Potez> listaBelih = new List<Potez>();
+            Koordinate beliKralj = NadjiFiguru(Tip.BeliKralj, this);
+            Koordinate beliTop = NadjiFiguru(Tip.BeliTop, this);
+            Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, this);
+            listaBelih.AddRange(FinalnaListaMogucihPoteza(this, new Potez(beliKralj.x, beliKralj.y)));
+            listaBelih.AddRange(FinalnaListaMogucihPoteza(this, new Potez(beliTop.x, beliTop.y)));
+            if (listaBelih.Contains(new Potez(crniKralj.x, crniKralj.y)))
+                return 100;
+            else
+                return -100;
+
         }
 
         //samo proverava da li crni kralj ima potez koji moze da odigra

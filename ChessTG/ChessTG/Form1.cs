@@ -77,52 +77,60 @@ namespace ChessTG
 
         private void b_Click(object sender, EventArgs e)
         {
-            Button b = sender as Button;
-            if (i % 2 != 0)//ako se klikne na prazno "i" ostaje 0
+            if (kontekst.naPotezu == 2)
             {
-                pocetneKoordinate = new Potez((int.Parse((int.Parse(b.Tag.ToString()) / 10).ToString())), (int.Parse((int.Parse(b.Tag.ToString()) % 10).ToString())));
-                listaMogucihPoteza = kontekst.FinalnaListaMogucihPoteza(kontekst, pocetneKoordinate);
-                if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 0)
-                    i--;
-                else
-                {
-                    //proverava da li je odgovarajuci igrac na potezu
-                    if ((kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 2 || kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 3) && kontekst.naPotezu == 1)
-                        i--;
-                    if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 1 && kontekst.naPotezu == 2)
-                        i--;
-                }
+
             }
-            if (i % 2 == 0)//vec je kliknuto jedanput na figuru, pa moze da se izvrsi potez, ukoliko se klikne na validno polje
+            else
             {
-                bool sadrzi = false;
-                odredisneKoordinate= new Potez((int.Parse((int.Parse(b.Tag.ToString()) / 10).ToString())), (int.Parse((int.Parse(b.Tag.ToString()) % 10).ToString())));
-                foreach(Potez p in listaMogucihPoteza)
+                Button b = sender as Button;
+
+                if (i % 2 != 0)//ako se klikne na prazno "i" ostaje 0
                 {
-                    if (p.Equals(odredisneKoordinate))  //(p.x == odredisneKoordinate.x && p.y == odredisneKoordinate.y)
-                        sadrzi = true;
+                    pocetneKoordinate = new Potez((int.Parse((int.Parse(b.Tag.ToString()) / 10).ToString())), (int.Parse((int.Parse(b.Tag.ToString()) % 10).ToString())));
+                    listaMogucihPoteza = kontekst.FinalnaListaMogucihPoteza(kontekst, pocetneKoordinate);
+                    if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 0)
+                        i--;
+                    else
+                    {
+                        //proverava da li je odgovarajuci igrac na potezu
+                        if ((kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 2 || kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 3) && kontekst.naPotezu == 1)
+                            i--;
+                        if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 1 && kontekst.naPotezu == 2)
+                            i--;
+                    }
                 }
-                /*
-                if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] != 3)
+                if (i % 2 == 0)//vec je kliknuto jedanput na figuru, pa moze da se izvrsi potez, ukoliko se klikne na validno polje
                 {
-                    if (!odredisneKoordinate.DalijeNapadnut(kontekst, (Tip)kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y], odredisneKoordinate))
-                        if (sadrzi)
-                        {
-                            kontekst.UradiPotez(pocetneKoordinate, odredisneKoordinate);
-                           // kontekst.naPotezu = kontekst.naPotezu ^ 3;
-                        }
-                }
-                else
-                { */
+                    bool sadrzi = false;
+                    odredisneKoordinate = new Potez((int.Parse((int.Parse(b.Tag.ToString()) / 10).ToString())), (int.Parse((int.Parse(b.Tag.ToString()) % 10).ToString())));
+                    foreach (Potez p in listaMogucihPoteza)
+                    {
+                        if (p.Equals(odredisneKoordinate))  //(p.x == odredisneKoordinate.x && p.y == odredisneKoordinate.y)
+                            sadrzi = true;
+                    }
+                    /*
+                    if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] != 3)
+                    {
+                        if (!odredisneKoordinate.DalijeNapadnut(kontekst, (Tip)kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y], odredisneKoordinate))
+                            if (sadrzi)
+                            {
+                                kontekst.UradiPotez(pocetneKoordinate, odredisneKoordinate);
+                               // kontekst.naPotezu = kontekst.naPotezu ^ 3;
+                            }
+                    }
+                    else
+                    { */
                     if (sadrzi)
                     {
                         kontekst.UradiPotez(pocetneKoordinate, odredisneKoordinate);
-                       // kontekst.naPotezu = kontekst.naPotezu ^ 3;
+                        // kontekst.naPotezu = kontekst.naPotezu ^ 3;
                     }
-                //}
-                Refresh();
+                    //}
+                    Refresh();
+                }
+                i++;
             }
-            i++;
         }
 
         public void  Refresh()
@@ -175,6 +183,14 @@ namespace ChessTG
             f.ShowDialog();
             kontekst.Stanje.matrica[trenutnaFiguraZaDodavanje.x - 1, trenutnaFiguraZaDodavanje.y - 1] = (int)Tip.BeliTop;
             btnDodajTopa.Enabled = false;
+            Refresh();
+        }
+
+        private void btnIgraj_Click(object sender, EventArgs e)
+        { //radi OPASNO!
+            Potez p = kontekst.AlphaBeta(kontekst, 6, int.MinValue, int.MaxValue, null);
+            Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure,kontekst);
+            kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x,mestoFigureKojaIgra.y),p);
             Refresh();
         }
     }

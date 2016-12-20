@@ -10,7 +10,10 @@ namespace ChessTG
     {
         #region Attributes
         //stavio sam da bude property umesto atributa
-        public Context StanjeTable { get; set;} 
+        // public Context StanjeTable { get; set;} 
+
+        public Tip tipFigure;
+
         public int x, y;
 
         public int Value { get; set; }
