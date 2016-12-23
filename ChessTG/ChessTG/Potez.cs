@@ -89,7 +89,7 @@ namespace ChessTG
             return false;
         }
 
-        //nisam koristio
+        //nisam koristio (TREBA DA SE PREKUCA!)
         public bool DalijeNapadnut(Context c,Tip t,Potez p)
         {
             List<Potez> lista = new List<Potez>();

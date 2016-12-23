@@ -36,6 +36,7 @@
             this.btnDodajTopa = new System.Windows.Forms.Button();
             this.lblNaPotezu = new System.Windows.Forms.Label();
             this.btnIgraj = new System.Windows.Forms.Button();
+            this.lblPotezi = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -131,11 +132,21 @@
             this.btnIgraj.UseVisualStyleBackColor = true;
             this.btnIgraj.Click += new System.EventHandler(this.btnIgraj_Click);
             // 
+            // lblPotezi
+            // 
+            this.lblPotezi.AutoSize = true;
+            this.lblPotezi.Location = new System.Drawing.Point(555, 234);
+            this.lblPotezi.Name = "lblPotezi";
+            this.lblPotezi.Size = new System.Drawing.Size(35, 13);
+            this.lblPotezi.TabIndex = 7;
+            this.lblPotezi.Text = "label1";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(702, 591);
+            this.Controls.Add(this.lblPotezi);
             this.Controls.Add(this.btnIgraj);
             this.Controls.Add(this.lblNaPotezu);
             this.Controls.Add(this.btnDodajTopa);
@@ -163,6 +174,7 @@
         private System.Windows.Forms.Button btnDodajTopa;
         private System.Windows.Forms.Label lblNaPotezu;
         private System.Windows.Forms.Button btnIgraj;
+        private System.Windows.Forms.Label lblPotezi;
     }
 }
 

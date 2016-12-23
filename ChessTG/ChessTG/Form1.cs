@@ -98,12 +98,14 @@ namespace ChessTG
                             i--;
                         if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 1 && kontekst.naPotezu == 2)
                             i--;
+                        
                     }
                 }
                 if (i % 2 == 0)//vec je kliknuto jedanput na figuru, pa moze da se izvrsi potez, ukoliko se klikne na validno polje
                 {
                     bool sadrzi = false;
                     odredisneKoordinate = new Potez((int.Parse((int.Parse(b.Tag.ToString()) / 10).ToString())), (int.Parse((int.Parse(b.Tag.ToString()) % 10).ToString())));
+                    odredisneKoordinate.tipFigure = (Tip)kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y];
                     foreach (Potez p in listaMogucihPoteza)
                     {
                         if (p.Equals(odredisneKoordinate))  //(p.x == odredisneKoordinate.x && p.y == odredisneKoordinate.y)
@@ -123,7 +125,7 @@ namespace ChessTG
                     { */
                     if (sadrzi)
                     {
-                        kontekst.UradiPotez(pocetneKoordinate, odredisneKoordinate);
+                        kontekst.UradiPotez(odredisneKoordinate,pocetneKoordinate);
                         // kontekst.naPotezu = kontekst.naPotezu ^ 3;
                     }
                     //}
@@ -188,10 +190,14 @@ namespace ChessTG
 
         private void btnIgraj_Click(object sender, EventArgs e)
         { //radi OPASNO!
-            Potez p = kontekst.AlphaBeta(kontekst, 6, int.MinValue, int.MaxValue, null);
-            Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure,kontekst);
-            kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x,mestoFigureKojaIgra.y),p);
-            Refresh();
+            if (kontekst.naPotezu == (int)Igra.Beli)
+            {
+                Potez p = kontekst.AlphaBeta(kontekst, 4, int.MinValue, int.MaxValue, null);
+                lblPotezi.Text = Context.i.ToString();
+                Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure, kontekst);
+                kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x,mestoFigureKojaIgra.y),p);
+                Refresh();
+            }
         }
     }
 }
