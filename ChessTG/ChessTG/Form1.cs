@@ -188,12 +188,13 @@ namespace ChessTG
             Refresh();
         }
 
-        private void btnIgraj_Click(object sender, EventArgs e)
-        { //radi OPASNO!
+        private void btnIgraj_Click(object sender, EventArgs e) { 
+         //radi OPASNO!
             if (kontekst.naPotezu == (int)Igra.Beli)
             {
-                Potez p = kontekst.AlphaBeta(kontekst, 4, int.MinValue, int.MaxValue, null);
+                Potez p = kontekst.AlphaBeta(kontekst, 5, int.MinValue, int.MaxValue);
                 lblPotezi.Text = Context.i.ToString();
+                Context.i = 0;
                 Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure, kontekst);
                 kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x,mestoFigureKojaIgra.y),p);
                 Refresh();

@@ -200,11 +200,11 @@ namespace ChessTG
         //skoro gotova
         //prilikom rekurzivnog poziva treba da se poziva za naredno stanje
         //treba da se testira 
-        public Potez AlphaBeta(Context ctx, int depth, int alpha, int beta,Potez trenutnoMesto)
+        public Potez AlphaBeta(Context ctx, int depth, int alpha, int beta)
         {
             Context.i++;
-            
-            
+            Potez trenutnoMesto;
+            Koordinate trenutneKoordinate;
             //-------------------------------
             Context zaProsledjivanje = new Context(ctx);
             List<Potez> listaPoteza = new List<Potez>();
@@ -241,13 +241,11 @@ namespace ChessTG
                 v = int.MinValue;
                 foreach (Potez pot in listaPoteza)
                 {
-                    if (listaKralja.Contains(pot))
-                        trenutnoMesto = new Potez(beliKralj.x, beliKralj.y);
-                    else
-                        trenutnoMesto = new Potez(beliTop.x, beliTop.y);
+                    trenutneKoordinate = NadjiFiguru(pot.tipFigure, zaProsledjivanje);
+                    trenutnoMesto = new Potez(trenutneKoordinate.x, trenutneKoordinate.y);
                     
                     zaProsledjivanje.UradiPotez(trenutnoMesto,pot);
-                    pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta,pot);
+                    pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta);
                     if (v < pom.Value)
                     {
                         v = pom.Value;
@@ -265,8 +263,10 @@ namespace ChessTG
                 v = int.MaxValue;
                 foreach (Potez pot in listaPoteza)
                 {
+                    trenutneKoordinate = NadjiFiguru(Tip.CrniKralj,zaProsledjivanje);
+                    trenutnoMesto = new Potez(trenutneKoordinate.x, trenutneKoordinate.y);
                     zaProsledjivanje.UradiPotez(trenutnoMesto,pot);
-                    pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta, pot);
+                    pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta);
                     if (v > pom.Value)
                     {
                         v = pom.Value;
@@ -355,7 +355,11 @@ namespace ChessTG
 
             return najbolji;
         }
-
+        /*
+         *  1) Get the king in opposition and give a check, 
+         *  2) If the rook is attacked, swing it over. 
+         *  No stalemates, no uncertainty regarding which piece to move. And the rectangle method is not totally different, you can see it as 2D extension of the 1D opposition method.
+         */
         public int Evaluate()
         {
             if (DaLiJeKraj())
@@ -364,6 +368,11 @@ namespace ChessTG
             Koordinate beliKralj = NadjiFiguru(Tip.BeliKralj, this);
             Koordinate beliTop = NadjiFiguru(Tip.BeliTop, this);
             Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, this);
+           
+            
+            
+            
+            
             int distance1 = Math.Abs((beliKralj.x - crniKralj.x)+(beliKralj.y-crniKralj.y));
             int distance2 = Math.Abs((beliTop.x - crniKralj.x) + (beliTop.y - crniKralj.y));
             listaBelih.AddRange(FinalnaListaMogucihPoteza(this, new Potez(beliKralj.x, beliKralj.y)));
@@ -379,13 +388,47 @@ namespace ChessTG
             
 
         }
+        /// <summary>
+        /// Proverava da li je kralj unesenog tipa cekiran
+        /// </summary>
+        /// <returns></returns>
+        public bool DalijeCheck()
+        {
+            Koordinate koordinate = NadjiFiguru(Tip.CrniKralj, this);
+            Koordinate koordinate1, koordinate2;
+            koordinate1 = NadjiFiguru(Tip.BeliKralj, this);
+            koordinate2 = NadjiFiguru(Tip.BeliTop, this);
+            if (koordinate.x == koordinate2.x || koordinate.y == koordinate2.y)
+                return true;
+            int x = koordinate.x;int y = koordinate.y;
+            if (x + 1 < 8)
+            {
+                if (Stanje.matrica[x + 1, y] == (int)Tip.BeliKralj)//dole
+                    return true;
+                if (y + 1 < 8)
+                {
+                    if (Stanje.matrica[x + 1, y + 1] == (int)Tip.BeliKralj)//gore-desno
+                        return true;
+                }
+                if (y - 1 >= 0)
+                {
+                    if (Stanje.matrica[x+1, y - 1] == (int)Tip.BeliKralj)//gore-levo
+                        return true;
+                }
+            }
+            return false;
+        }
 
         //samo proverava da li crni kralj ima potez koji moze da odigra
         //treba da se proveri i da li je napadnut
         public bool DaLiJeKraj()
         {
             Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, this);
-            return FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y)).Count == 0;
+            if(listaMogucihPoteza(Tip.CrniKralj,new Potez(crniKralj.x, crniKralj.y)).Count == 0)
+            {
+                return true;
+            }
+            return false;
         }
         /// <summary>
         /// Vrsi potez
