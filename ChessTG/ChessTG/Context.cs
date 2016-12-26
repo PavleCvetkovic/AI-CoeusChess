@@ -37,6 +37,7 @@ namespace ChessTG
         public int naPotezu; 
         public Tabla Stanje;
         public static long i;
+        public static int brojPotezaCrnog=0;
         public Context()
         {
             Stanje = new Tabla();
@@ -108,7 +109,6 @@ namespace ChessTG
                     {
                         listaNedozvoljenihPoteza.AddRange(ctx.listaMogucihPoteza(((Tip)ctx.Stanje.matrica[listaBelihFigura[i - 1].x, listaBelihFigura[i - 1].y]), new Potez(listaBelihFigura[i - 1].x, listaBelihFigura[i - 1].y)));
                     }
-                    listaNedozvoljenihPoteza.Add(new Potez(crniKraljPozicija.x, crniKraljPozicija.y));
 
                     break;
 
@@ -119,8 +119,7 @@ namespace ChessTG
                     //-----
                     
                     listaNedozvoljenihPoteza = listaMogucihPoteza(Tip.CrniKralj,new Potez(crniKraljPozicija.x, crniKraljPozicija.y));
-                    listaNedozvoljenihPoteza.Add(new Potez(beliTop.x, beliTop.y));
-                    listaNedozvoljenihPoteza.Add(new Potez(beliKralj.x, beliKralj.y));
+
                     break;
 
                 case Tip.BeliTop:       //treba da nadje polja koja napada crni kralj, a ne stiti beli kralj
@@ -132,10 +131,6 @@ namespace ChessTG
                     List<Potez> kretanjeBelogKralja = listaMogucihPoteza(Tip.BeliKralj, new Potez(beliKralj.x, beliKralj.y));
 
                     listaNedozvoljenihPoteza = listaNedozvoljenihPoteza.Except(kretanjeBelogKralja).ToList();
-                    //-----------------------DODAO PAJA----------------------------------------------
-                    listaNedozvoljenihPoteza.Add(new Potez(beliKralj.x, beliKralj.y));
-                    listaNedozvoljenihPoteza.Add(new Potez(beliTop.x, beliTop.y));
-                    //---------------------------------------------
                     break;
             }
 
@@ -206,7 +201,7 @@ namespace ChessTG
             Potez trenutnoMesto;
             Koordinate trenutneKoordinate;
             //-------------------------------
-            Context zaProsledjivanje = new Context(ctx);
+           // Context zaProsledjivanje = new Context(ctx);
             List<Potez> listaPoteza = new List<Potez>();
             List<Potez> listaKralja = new List<Potez>();
             List<Potez> listaTopa = new List<Potez>();
@@ -241,9 +236,9 @@ namespace ChessTG
                 v = int.MinValue;
                 foreach (Potez pot in listaPoteza)
                 {
-                    trenutneKoordinate = NadjiFiguru(pot.tipFigure, zaProsledjivanje);
+                    trenutneKoordinate = NadjiFiguru(pot.tipFigure, ctx);
                     trenutnoMesto = new Potez(trenutneKoordinate.x, trenutneKoordinate.y);
-                    
+                    Context zaProsledjivanje = new Context(ctx);
                     zaProsledjivanje.UradiPotez(trenutnoMesto,pot);
                     pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta);
                     if (v < pom.Value)
@@ -263,8 +258,9 @@ namespace ChessTG
                 v = int.MaxValue;
                 foreach (Potez pot in listaPoteza)
                 {
-                    trenutneKoordinate = NadjiFiguru(Tip.CrniKralj,zaProsledjivanje);
+                    trenutneKoordinate = NadjiFiguru(Tip.CrniKralj,ctx);
                     trenutnoMesto = new Potez(trenutneKoordinate.x, trenutneKoordinate.y);
+                    Context zaProsledjivanje = new Context(ctx);
                     zaProsledjivanje.UradiPotez(trenutnoMesto,pot);
                     pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta);
                     if (v > pom.Value)
@@ -363,30 +359,22 @@ namespace ChessTG
         public int Evaluate()
         {
             if (DaLiJeKraj())
-                return 10000;
+                return 100000;
             List<Potez> listaBelih = new List<Potez>();
             Koordinate beliKralj = NadjiFiguru(Tip.BeliKralj, this);
             Koordinate beliTop = NadjiFiguru(Tip.BeliTop, this);
             Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, this);
-           
-            
-            
-            
-            
-            int distance1 = Math.Abs((beliKralj.x - crniKralj.x)+(beliKralj.y-crniKralj.y));
-            int distance2 = Math.Abs((beliTop.x - crniKralj.x) + (beliTop.y - crniKralj.y));
-            listaBelih.AddRange(FinalnaListaMogucihPoteza(this, new Potez(beliKralj.x, beliKralj.y)));
-            listaBelih.AddRange(FinalnaListaMogucihPoteza(this, new Potez(beliTop.x, beliTop.y)));
-            if (listaBelih.Contains(new Potez(crniKralj.x, crniKralj.y)))
-                return 100;
-            else if (distance2 < 10)
-                return 10;
-            else if (distance1 < 4)
-                return 10;
+            if (Context.brojPotezaCrnog - FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y)).Count > 4)
+                return 1000;
+            else if (Context.brojPotezaCrnog - FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y)).Count > 3)
+                return 900;
+            else if (Context.brojPotezaCrnog - FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y)).Count > 2)
+                return 500;
+            else if (Context.brojPotezaCrnog - FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y)).Count > 1)
+                return 300;
             else
-                return -100;
-            
-
+                return -1000;
+           
         }
         /// <summary>
         /// Proverava da li je kralj unesenog tipa cekiran
@@ -424,7 +412,7 @@ namespace ChessTG
         public bool DaLiJeKraj()
         {
             Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, this);
-            if(listaMogucihPoteza(Tip.CrniKralj,new Potez(crniKralj.x, crniKralj.y)).Count == 0)
+            if (FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y)).Count==0)
             {
                 return true;
             }

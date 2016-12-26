@@ -32,6 +32,12 @@ namespace ChessTG
             this.x = x;
             this.y = y;
         }
+        public Potez(Potez p)
+        {
+            this.x = p.x;
+            y = p.y;
+            Value = p.Value;
+        }
 
         #endregion
 
