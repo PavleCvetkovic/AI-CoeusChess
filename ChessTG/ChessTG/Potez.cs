@@ -87,7 +87,7 @@ namespace ChessTG
                 }
                 if (this.y == p.y)
                 {
-                    if (this.x != p.y)
+                    if (this.x != p.x)
                         return true;
                     return false;
                 }
