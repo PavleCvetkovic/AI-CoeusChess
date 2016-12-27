@@ -90,47 +90,70 @@ namespace ChessTG
             Tip figura = (Tip)ctx.Stanje.matrica[trenutneKoordinate.x, trenutneKoordinate.y];
             Koordinate beliKralj = NadjiFiguru(Tip.BeliKralj, ctx);
             Koordinate beliTop = NadjiFiguru(Tip.BeliTop, ctx);
-            Koordinate crniKraljPozicija = NadjiFiguru(Tip.CrniKralj, ctx);
+            Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, ctx);
             //kreira listu svih poteza za figuru
             listaZaVracanje = ctx.listaMogucihPoteza(figura, trenutneKoordinate);
             switch (figura)
             {
                 case Tip.CrniKralj:     //treba da nadje polja koja napadaju beli kralj i top
 
-                    List<Tip> beleFigure = new List<Tip>();
-                    beleFigure.Add(Tip.BeliKralj);
-                    beleFigure.Add(Tip.BeliTop);
+                    listaNedozvoljenihPoteza = listaMogucihPoteza(Tip.BeliKralj, new Potez(beliKralj.x, beliKralj.y));
+                    listaNedozvoljenihPoteza.AddRange(listaMogucihPoteza(Tip.BeliTop,new Potez(beliTop.x,beliTop.y)));
 
-                    //vraca listu koordinata svih nadjenih belih figura
-                    List<Koordinate> listaBelihFigura = NadjiFigure(beleFigure, ctx);
-
-                    //u listu nedozvoljenih poteza dodaje sve moguce poteze belih figura
-                    for (int i = 1; i <= listaBelihFigura.Count; i++)
+                    if (beliKralj.x == beliTop.x || beliKralj.y == beliTop.y)
                     {
-                        listaNedozvoljenihPoteza.AddRange(ctx.listaMogucihPoteza(((Tip)ctx.Stanje.matrica[listaBelihFigura[i - 1].x, listaBelihFigura[i - 1].y]), new Potez(listaBelihFigura[i - 1].x, listaBelihFigura[i - 1].y)));
+                        List<Potez> blokiraniPotezi = new List<Potez>();
+
+                        if (beliKralj.x == beliTop.x)
+                        {
+                            if (beliKralj.y < beliTop.y)
+                                for (int i = 0; i <= beliKralj.y; blokiraniPotezi.Add(new Potez(beliKralj.x, i++))) ;
+                            else
+                                for (int i = 7; i >= beliKralj.y; blokiraniPotezi.Add(new Potez(beliKralj.x, i--))) ;
+                        }
+                        else if (beliKralj.y == beliTop.y)
+                        {
+                            if (beliKralj.x < beliTop.x)
+                                for (int i = 0; i <= beliKralj.x; blokiraniPotezi.Add(new Potez(i++, beliKralj.y))) ;
+                            else
+                                for (int i = 7; i >= beliKralj.x; blokiraniPotezi.Add(new Potez(i--, beliKralj.y))) ;
+                        }
+
+                        listaNedozvoljenihPoteza = listaNedozvoljenihPoteza.Except(blokiraniPotezi).ToList();
                     }
 
                     break;
 
                 case Tip.BeliKralj:     //treba da nadje polja koja napada crni kralj
-
                     
-                    
-                    //-----
-                    
-                    listaNedozvoljenihPoteza = listaMogucihPoteza(Tip.CrniKralj,new Potez(crniKraljPozicija.x, crniKraljPozicija.y));
+                    listaNedozvoljenihPoteza = listaMogucihPoteza(Tip.CrniKralj,new Potez(crniKralj.x, crniKralj.y));
 
                     break;
 
                 case Tip.BeliTop:       //treba da nadje polja koja napada crni kralj, a ne stiti beli kralj
-
-                    
-                    Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, ctx);
+                                        //i da mu onemoguci da preskace belog kralja
 
                     listaNedozvoljenihPoteza = listaMogucihPoteza(Tip.CrniKralj, new Potez(crniKralj.x, crniKralj.y));
                     List<Potez> kretanjeBelogKralja = listaMogucihPoteza(Tip.BeliKralj, new Potez(beliKralj.x, beliKralj.y));
 
                     listaNedozvoljenihPoteza = listaNedozvoljenihPoteza.Except(kretanjeBelogKralja).ToList();
+
+                    //proverava da li beli kralj blokira kretanje topa
+                    if (beliKralj.x == beliTop.x)
+                    {
+                        if (beliKralj.y < beliTop.y)
+                            for (int i = 0; i <= beliKralj.y; listaNedozvoljenihPoteza.Add(new Potez(beliKralj.x, i++))) ;
+                        else
+                            for (int i = 7; i >= beliKralj.y; listaNedozvoljenihPoteza.Add(new Potez(beliKralj.x, i--))) ;
+                    }
+                    else if (beliKralj.y == beliTop.y)
+                    {
+                        if(beliKralj.x < beliTop.x)
+                            for (int i = 0; i <= beliKralj.x; listaNedozvoljenihPoteza.Add(new Potez(i++, beliKralj.y))) ;
+                        else
+                            for (int i = 7; i >= beliKralj.x; listaNedozvoljenihPoteza.Add(new Potez(i--, beliKralj.y))) ;
+                    }
+
                     break;
             }
 
