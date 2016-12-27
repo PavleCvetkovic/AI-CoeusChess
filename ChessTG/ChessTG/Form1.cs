@@ -186,6 +186,7 @@ namespace ChessTG
                 kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x,mestoFigureKojaIgra.y),p);
                 Refresh();
                 label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
+               
                 if (kontekst.DaLiJeKraj())
                 {
                     if (kontekst.DaLiJeMat())

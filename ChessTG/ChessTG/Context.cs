@@ -362,8 +362,10 @@ namespace ChessTG
             else //provera za belog kralja i belog topa
             {
                 Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, this);
+                Koordinate beliKralj = NadjiFiguru(Tip.BeliKralj, this);
                 if (Math.Abs(crniKralj.x - koordinate.x) <= 1&& Math.Abs(crniKralj.y - koordinate.y) <= 1)
-                    return true;
+                    if(!(Math.Abs(beliKralj.x - koordinate.x) <= 1 && Math.Abs(beliKralj.y - koordinate.y) <= 1)) //pita se da li je top ranjiv(nije sticen)
+                        return true;
             }
 
             return false;
