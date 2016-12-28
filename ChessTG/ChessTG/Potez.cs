@@ -9,8 +9,6 @@ namespace ChessTG
     public class Potez
     {
         #region Attributes
-        //stavio sam da bude property umesto atributa
-        // public Context StanjeTable { get; set;} 
 
         public Tip tipFigure;
 
@@ -50,7 +48,7 @@ namespace ChessTG
             return false;
         }
         /// <summary>
-        /// Provarava validnost poteza
+        /// Provarava validnost poteza(da li moze da skoci na polje)(ne gleda da li je zauzeto, samo da li je potez validan u smislu povlacenja)
         /// </summary>
         /// <param name="tip"></param>
         /// <param name="p">Polazne koordinate</param>

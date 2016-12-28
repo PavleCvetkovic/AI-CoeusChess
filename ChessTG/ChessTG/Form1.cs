@@ -77,18 +77,11 @@ namespace ChessTG
 
         private void b_Click(object sender, EventArgs e)
         {
-            if (kontekst.naPotezu == 2)
-            {
-
-            }
-            else
-            {
                 Button b = sender as Button;
 
                 if (i % 2 != 0)//ako se klikne na prazno "i" ostaje 0
                 {
                     pocetneKoordinate = new Potez((int.Parse((int.Parse(b.Tag.ToString()) / 10).ToString())), (int.Parse((int.Parse(b.Tag.ToString()) % 10).ToString())));
-                    listaMogucihPoteza = kontekst.FinalnaListaMogucihPoteza(kontekst, pocetneKoordinate);
                     if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 0)
                         i--;
                     else
@@ -98,8 +91,8 @@ namespace ChessTG
                             i--;
                         if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 1 && kontekst.naPotezu == 2)
                             i--;
-                        
                     }
+                    listaMogucihPoteza = kontekst.FinalnaListaMogucihPoteza(kontekst, pocetneKoordinate);
                 }
                 if (i % 2 == 0)//vec je kliknuto jedanput na figuru, pa moze da se izvrsi potez, ukoliko se klikne na validno polje
                 {
@@ -108,31 +101,25 @@ namespace ChessTG
                     odredisneKoordinate.tipFigure = (Tip)kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y];
                     foreach (Potez p in listaMogucihPoteza)
                     {
-                        if (p.Equals(odredisneKoordinate))  //(p.x == odredisneKoordinate.x && p.y == odredisneKoordinate.y)
+                        if (p.Equals(odredisneKoordinate))
                             sadrzi = true;
                     }
-                    /*
-                    if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] != 3)
-                    {
-                        if (!odredisneKoordinate.DalijeNapadnut(kontekst, (Tip)kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y], odredisneKoordinate))
-                            if (sadrzi)
-                            {
-                                kontekst.UradiPotez(pocetneKoordinate, odredisneKoordinate);
-                               // kontekst.naPotezu = kontekst.naPotezu ^ 3;
-                            }
-                    }
-                    else
-                    { */
+                   
                     if (sadrzi)
                     {
                         kontekst.UradiPotez(odredisneKoordinate,pocetneKoordinate);
-                        // kontekst.naPotezu = kontekst.naPotezu ^ 3;
                     }
-                    //}
                     Refresh();
+                label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
+                if (kontekst.DaLiJeKraj())
+                {
+                    if (kontekst.DaLiJeMat())
+                        MessageBox.Show("MAT!");
+                    else
+                        MessageBox.Show("PAT!");
                 }
-                i++;
             }
+                i++;
         }
 
         public void  Refresh()
@@ -157,8 +144,6 @@ namespace ChessTG
                     else
                         tableLayoutPanel1.Controls[i*8+j].BackgroundImage = null;
             lblNaPotezu.Text = ((Igra)kontekst.naPotezu).ToString();
-
-
         }
 
         private void btnDodajCrnog_Click(object sender, EventArgs e)
@@ -200,6 +185,15 @@ namespace ChessTG
                 Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure, kontekst);
                 kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x,mestoFigureKojaIgra.y),p);
                 Refresh();
+                label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
+               
+                if (kontekst.DaLiJeKraj())
+                {
+                    if (kontekst.DaLiJeMat())
+                        MessageBox.Show("MAT!");
+                    else
+                        MessageBox.Show("PAT!");
+                }
             }
         }
     }
