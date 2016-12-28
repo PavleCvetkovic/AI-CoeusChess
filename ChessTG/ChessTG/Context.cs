@@ -31,13 +31,25 @@ namespace ChessTG
             this.y = j;
         }
     }
-
     public class Context
     {
         public int naPotezu; 
         public Tabla Stanje;
         public static long i;
         public static int brojPotezaCrnog=0;
+        /*The Center Manhattan-Distance is the Manhattan-Distance or number of orthogonal 
+          King moves on the otherwise empty board from any square to the four 
+          squares {d4, d5, e4, e5} in the center of the board.*/
+        public static int[,] CMD ={ 
+          { 6, 5, 4, 3, 3, 4, 5, 6 },
+          { 5, 4, 3, 2, 2, 3, 4, 5 },
+          { 4, 3, 2, 1, 1, 2, 3, 4 },
+          { 3, 2, 1, 0, 0, 1, 2, 3 },
+          { 3, 2, 1, 0, 0, 1, 2, 3 },
+          { 4, 3, 2, 1, 1, 2, 3, 4 },
+          { 5, 4, 3, 2, 2, 3, 4, 5 },
+          { 6, 5, 4, 3, 3, 4, 5, 6 }
+        };
         public Context()
         {
             Stanje = new Tabla();
@@ -334,14 +346,21 @@ namespace ChessTG
                 Koordinate beliKralj = NadjiFiguru(Tip.BeliKralj, this);
                 Koordinate beliTop = NadjiFiguru(Tip.BeliTop, this);
                 List<Potez> listaBelogTopa = FinalnaListaMogucihPoteza(this, new Potez(beliTop.x, beliTop.y));
+                int dwkbk = ChebyshevDistance(beliKralj.x, beliKralj.y, koordinate.x, koordinate.y);
+                int dwrbk = ChebyshevDistance(beliTop.x, beliTop.y, koordinate.x, koordinate.y);
                 if (koordinate.x == beliTop.x)
                 {
                     if (koordinate.x != beliKralj.x)
                         return true;
                     else
                     {
-                        if (Math.Abs(koordinate.x - beliKralj.x) < Math.Abs(koordinate.x - beliTop.x))
+                        if ((beliKralj.y < koordinate.y && koordinate.y < beliTop.y) || (beliTop.y < koordinate.y && koordinate.y < beliKralj.y))
                             return true;
+                        else
+                        {
+                            if (dwrbk < dwkbk)
+                                return true;
+                        }
                         return false;
                     }
                 }
@@ -351,23 +370,27 @@ namespace ChessTG
                         return true;
                     else
                     {
-                        if (Math.Abs(koordinate.y - beliKralj.y) < Math.Abs(koordinate.y - beliTop.y))
+                        if ((beliKralj.x < koordinate.x && koordinate.x < beliTop.x) || (beliTop.x < koordinate.x && koordinate.x < beliKralj.x))
                             return true;
+                        else
+                        {
+                            if (dwrbk < dwkbk)
+                                return true;
+                        }
                         return false;
                     }
                 }
-                if (Math.Abs(beliKralj.x - koordinate.x) <= 1 && Math.Abs(beliKralj.y - koordinate.y) <= 1)
+                if (ChebyshevDistance(beliKralj.x, beliKralj.y, koordinate.x, koordinate.y) == 1) //ovo nikad nece da se bude true
                     return true;
             }
-            else //provera za belog kralja i belog topa
+            else //provera  belog topa
             {
                 Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, this);
                 Koordinate beliKralj = NadjiFiguru(Tip.BeliKralj, this);
-                if (Math.Abs(crniKralj.x - koordinate.x) <= 1&& Math.Abs(crniKralj.y - koordinate.y) <= 1)
-                    if(!(Math.Abs(beliKralj.x - koordinate.x) <= 1 && Math.Abs(beliKralj.y - koordinate.y) <= 1)) //pita se da li je top ranjiv(nije sticen)
+                if (ChebyshevDistance(crniKralj.x, crniKralj.y, koordinate.x, koordinate.y) == 1)
+                    if (ChebyshevDistance(beliKralj.x, beliKralj.y, koordinate.x, koordinate.y) != 1)
                         return true;
             }
-
             return false;
         }
 
@@ -384,6 +407,10 @@ namespace ChessTG
             }
             return false;
         }
+        /// <summary>
+        /// Da li je crni kralj matiran
+        /// </summary>
+        /// <returns></returns>
         public bool DaLiJeMat()
         {
             if (DaLiJeKraj())
@@ -403,6 +430,10 @@ namespace ChessTG
             Stanje.matrica[p1.x, p1.y] = Stanje.matrica[p2.x, p2.y];
             Stanje.matrica[p2.x, p2.y] = tmp;
             naPotezu = naPotezu ^ 3;
+        }
+        public int ChebyshevDistance(int x,int y,int x1,int y1)
+        {
+            return Math.Max(Math.Abs(x1 - x), Math.Abs(y1 - y));
         }
         #endregion
     }
