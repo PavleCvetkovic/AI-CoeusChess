@@ -40,7 +40,7 @@ namespace ChessTG
         /*The Center Manhattan-Distance is the Manhattan-Distance or number of orthogonal 
           King moves on the otherwise empty board from any square to the four 
           squares {d4, d5, e4, e5} in the center of the board.*/
-        public static int[,] CMD ={ 
+        public static readonly int[,] CMD ={ 
           { 6, 5, 4, 3, 3, 4, 5, 6 },
           { 5, 4, 3, 2, 2, 3, 4, 5 },
           { 4, 3, 2, 1, 1, 2, 3, 4 },
@@ -314,8 +314,13 @@ namespace ChessTG
        
         public int Evaluate()
         {
-            if (DaLiJeKraj())
+            if (DaLiJeMat())
                 return 100000;
+            if (DaLiJeKraj())
+                return 0;
+            if (DalijeNapadnut(Tip.BeliTop))
+                return -1000000;
+            
             List<Potez> listaBelih = new List<Potez>();
             Koordinate beliKralj = NadjiFiguru(Tip.BeliKralj, this);
             Koordinate beliTop = NadjiFiguru(Tip.BeliTop, this);
@@ -403,6 +408,7 @@ namespace ChessTG
             Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, this);
             if (FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y)).Count==0)
             {
+                if(!DalijeNapadnut(Tip.BeliTop))
                     return true;
             }
             return false;
@@ -415,7 +421,7 @@ namespace ChessTG
         {
             if (DaLiJeKraj())
                 if (DalijeNapadnut(Tip.CrniKralj))
-                    return true;
+                        return true;
             return false;
         }
         /// <summary>
@@ -434,6 +440,10 @@ namespace ChessTG
         public int ChebyshevDistance(int x,int y,int x1,int y1)
         {
             return Math.Max(Math.Abs(x1 - x), Math.Abs(y1 - y));
+        }
+        public int ManhattanDistance(int x,int y,int x1,int y1)
+        {
+            return ((Math.Abs(x1 - x)) + Math.Abs(y1 - y));
         }
         #endregion
     }

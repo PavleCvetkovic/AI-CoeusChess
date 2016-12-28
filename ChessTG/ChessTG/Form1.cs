@@ -179,7 +179,7 @@ namespace ChessTG
             {
                 Koordinate crniKralj = kontekst.NadjiFiguru(Tip.CrniKralj, kontekst);
                 Context.brojPotezaCrnog = kontekst.FinalnaListaMogucihPoteza(kontekst, new Potez(crniKralj.x, crniKralj.y)).Count;
-                Potez p = kontekst.AlphaBeta(kontekst, 5, int.MinValue, int.MaxValue);
+                Potez p = kontekst.AlphaBeta(kontekst, 6, int.MinValue, int.MaxValue);
                 lblPotezi.Text = Context.i.ToString();
 
                 Context.i = 0;
