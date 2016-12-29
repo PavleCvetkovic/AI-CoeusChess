@@ -311,6 +311,8 @@ namespace ChessTG
         {
             if (naPotezu == (int)Igra.Beli)
             {
+                if (DalijeNapadnut(Tip.BeliTop))
+                    return -1000000;
                 return (heuristic_beli(depth));
             }
             else
@@ -428,8 +430,6 @@ namespace ChessTG
         }
         public int heuristic_beli(int dubina)
         {
-            if (DalijeNapadnut(Tip.BeliTop))
-                return int.MinValue;
             double bonus = 0, penalty = 0;
             double BrojPotezaCrnog = 0;
             Koordinate beliKralj, crniKralj, beliTop;
@@ -446,7 +446,7 @@ namespace ChessTG
                 penalty += 1000 / Math.Abs(dubina)+1;
             if(naPotezu==(int)Igra.Crni)
                 if (DalijeNapadnut(Tip.BeliTop)) 
-                     penalty += 1000;
+                     penalty += 99999999;
             if (ChebyshevDistance(beliKralj.x, beliKralj.y, crniKralj.x, crniKralj.y) == 2)
                 bonus += 20;
 
