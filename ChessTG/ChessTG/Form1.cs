@@ -111,6 +111,7 @@ namespace ChessTG
                     }
                     Refresh();
                 label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
+                label3.Text = kontekst.DalijeNapadnut(Tip.BeliTop).ToString();
                 if (kontekst.DaLiJeKraj())
                 {
                     if (kontekst.DaLiJeMat())
@@ -178,7 +179,7 @@ namespace ChessTG
             {
                 Koordinate crniKralj = kontekst.NadjiFiguru(Tip.CrniKralj, kontekst);
                 Context.brojPotezaCrnog = kontekst.FinalnaListaMogucihPoteza(kontekst, new Potez(crniKralj.x, crniKralj.y)).Count;
-                Potez p = kontekst.AlphaBeta(kontekst, 5, int.MinValue, int.MaxValue);
+                Potez p = kontekst.AlphaBeta(kontekst, 6, int.MinValue, int.MaxValue);
                 lblPotezi.Text = Context.i.ToString();
 
                 Context.i = 0;
@@ -186,7 +187,26 @@ namespace ChessTG
                 kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x,mestoFigureKojaIgra.y),p);
                 Refresh();
                 label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
+                label3.Text = kontekst.DalijeNapadnut(Tip.BeliTop).ToString();
                
+                if (kontekst.DaLiJeKraj())
+                {
+                    if (kontekst.DaLiJeMat())
+                        MessageBox.Show("MAT!");
+                    else
+                        MessageBox.Show("PAT!");
+                }
+            }
+            else
+            {
+                Context.i = 0;
+                Potez p = kontekst.AlphaBeta(kontekst, 6, int.MinValue, int.MaxValue);
+                lblPotezi.Text = Context.i.ToString();
+                Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure, kontekst);
+                kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x, mestoFigureKojaIgra.y), p);
+                Refresh();
+                label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
+                label3.Text = kontekst.DalijeNapadnut(Tip.BeliTop).ToString();
                 if (kontekst.DaLiJeKraj())
                 {
                     if (kontekst.DaLiJeMat())
