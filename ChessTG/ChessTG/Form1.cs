@@ -56,7 +56,7 @@ namespace ChessTG
                         if (j % 2 != 0)
                             b.BackColor = Color.White;
                         else
-                            b.BackColor = Color.LightGreen;
+                            b.BackColor = Color.LightGreen ;
                     }
                     b.Dock = System.Windows.Forms.DockStyle.Fill;
                     b.Font = new System.Drawing.Font("Stencil", 5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -92,10 +92,15 @@ namespace ChessTG
                         if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 1 && kontekst.naPotezu == 2)
                             i--;
                     }
-                    listaMogucihPoteza = kontekst.FinalnaListaMogucihPoteza(kontekst, pocetneKoordinate);
-                }
+                listaMogucihPoteza = kontekst.FinalnaListaMogucihPoteza(kontekst, pocetneKoordinate);
+                if (listaMogucihPoteza.Count > 0)
+                    foreach (Potez p in listaMogucihPoteza)
+                        buttons[p.x, p.y].BackColor = Color.LightSkyBlue;
+
+            }
                 if (i % 2 == 0)//vec je kliknuto jedanput na figuru, pa moze da se izvrsi potez, ukoliko se klikne na validno polje
                 {
+
                     bool sadrzi = false;
                     odredisneKoordinate = new Potez((int.Parse((int.Parse(b.Tag.ToString()) / 10).ToString())), (int.Parse((int.Parse(b.Tag.ToString()) % 10).ToString())));
                     odredisneKoordinate.tipFigure = (Tip)kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y];
@@ -110,16 +115,16 @@ namespace ChessTG
                         kontekst.UradiPotez(odredisneKoordinate,pocetneKoordinate);
                     }
                     Refresh();
-                label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
-                label3.Text = kontekst.DalijeNapadnut(Tip.BeliTop).ToString();
-                if (kontekst.DaLiJeKraj())
-                {
-                    if (kontekst.DaLiJeMat())
-                        MessageBox.Show("MAT!");
-                    else
-                        MessageBox.Show("PAT!");
-                }
-            }
+                    label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
+                    label3.Text = kontekst.DalijeNapadnut(Tip.BeliTop).ToString();
+                    if (kontekst.DaLiJeKraj())
+                    {
+                        if (kontekst.DaLiJeMat())
+                            MessageBox.Show("MAT!");
+                        else
+                            MessageBox.Show("PAT!");
+                    }
+             }
                 i++;
         }
 
@@ -127,6 +132,23 @@ namespace ChessTG
         {
             for (int i = 0; i < 8; i++)
                 for (int j = 0; j < 8; j++)
+                {
+
+                    if (i % 2 == 0)
+                    {
+                        if (j % 2 == 0)
+                            buttons[i,j].BackColor = Color.White;
+                        else
+                            buttons[i,j].BackColor = Color.LightGreen;
+                    }
+                    else
+                    {
+                        if (j % 2 != 0)
+                            buttons[i,j].BackColor = Color.White;
+                        else
+                            buttons[i,j].BackColor = Color.LightGreen;
+                    }
+
                     if (kontekst.Stanje.matrica[i, j] == 1)
                     {
                         tableLayoutPanel1.Controls[i * 8 + j].BackgroundImage = Resources.crnikralj;
@@ -143,7 +165,8 @@ namespace ChessTG
                         tableLayoutPanel1.Controls[i * 8 + j].BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     else
-                        tableLayoutPanel1.Controls[i*8+j].BackgroundImage = null;
+                        tableLayoutPanel1.Controls[i * 8 + j].BackgroundImage = null;
+                }
             lblNaPotezu.Text = ((Igra)kontekst.naPotezu).ToString();
         }
 
