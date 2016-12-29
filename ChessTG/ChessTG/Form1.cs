@@ -197,6 +197,24 @@ namespace ChessTG
                         MessageBox.Show("PAT!");
                 }
             }
+            else
+            {
+                Context.i = 0;
+                Potez p = kontekst.AlphaBeta(kontekst, 6, int.MinValue, int.MaxValue);
+                lblPotezi.Text = Context.i.ToString();
+                Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure, kontekst);
+                kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x, mestoFigureKojaIgra.y), p);
+                Refresh();
+                label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
+                label3.Text = kontekst.DalijeNapadnut(Tip.BeliTop).ToString();
+                if (kontekst.DaLiJeKraj())
+                {
+                    if (kontekst.DaLiJeMat())
+                        MessageBox.Show("MAT!");
+                    else
+                        MessageBox.Show("PAT!");
+                }
+            }
         }
     }
 }
