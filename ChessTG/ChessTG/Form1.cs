@@ -56,7 +56,7 @@ namespace ChessTG
                         if (j % 2 != 0)
                             b.BackColor = Color.White;
                         else
-                            b.BackColor = Color.LightGreen;
+                            b.BackColor = Color.LightGreen ;
                     }
                     b.Dock = System.Windows.Forms.DockStyle.Fill;
                     b.Font = new System.Drawing.Font("Stencil", 5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -92,10 +92,15 @@ namespace ChessTG
                         if (kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y] == 1 && kontekst.naPotezu == 2)
                             i--;
                     }
-                    listaMogucihPoteza = kontekst.FinalnaListaMogucihPoteza(kontekst, pocetneKoordinate);
-                }
+                listaMogucihPoteza = kontekst.FinalnaListaMogucihPoteza(kontekst, pocetneKoordinate);
+                if (listaMogucihPoteza.Count > 0)
+                    foreach (Potez p in listaMogucihPoteza)
+                        buttons[p.x, p.y].BackColor = Color.LightSkyBlue;
+
+            }
                 if (i % 2 == 0)//vec je kliknuto jedanput na figuru, pa moze da se izvrsi potez, ukoliko se klikne na validno polje
                 {
+
                     bool sadrzi = false;
                     odredisneKoordinate = new Potez((int.Parse((int.Parse(b.Tag.ToString()) / 10).ToString())), (int.Parse((int.Parse(b.Tag.ToString()) % 10).ToString())));
                     odredisneKoordinate.tipFigure = (Tip)kontekst.Stanje.matrica[pocetneKoordinate.x, pocetneKoordinate.y];
@@ -110,16 +115,16 @@ namespace ChessTG
                         kontekst.UradiPotez(odredisneKoordinate,pocetneKoordinate);
                     }
                     Refresh();
-                label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
-                label3.Text = kontekst.DalijeNapadnut(Tip.BeliTop).ToString();
-                if (kontekst.DaLiJeKraj())
-                {
-                    if (kontekst.DaLiJeMat())
-                        MessageBox.Show("MAT!");
-                    else
-                        MessageBox.Show("PAT!");
-                }
-            }
+                    label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
+                    label3.Text = kontekst.DalijeNapadnut(Tip.BeliTop).ToString();
+                    if (kontekst.DaLiJeKraj())
+                    {
+                        if (kontekst.DaLiJeMat())
+                            MessageBox.Show("MAT!");
+                        else
+                            MessageBox.Show("PAT!");
+                    }
+             }
                 i++;
         }
 
@@ -127,6 +132,23 @@ namespace ChessTG
         {
             for (int i = 0; i < 8; i++)
                 for (int j = 0; j < 8; j++)
+                {
+
+                    if (i % 2 == 0)
+                    {
+                        if (j % 2 == 0)
+                            buttons[i,j].BackColor = Color.White;
+                        else
+                            buttons[i,j].BackColor = Color.LightGreen;
+                    }
+                    else
+                    {
+                        if (j % 2 != 0)
+                            buttons[i,j].BackColor = Color.White;
+                        else
+                            buttons[i,j].BackColor = Color.LightGreen;
+                    }
+
                     if (kontekst.Stanje.matrica[i, j] == 1)
                     {
                         tableLayoutPanel1.Controls[i * 8 + j].BackgroundImage = Resources.crnikralj;
@@ -143,7 +165,8 @@ namespace ChessTG
                         tableLayoutPanel1.Controls[i * 8 + j].BackgroundImageLayout = ImageLayout.Stretch;
                     }
                     else
-                        tableLayoutPanel1.Controls[i*8+j].BackgroundImage = null;
+                        tableLayoutPanel1.Controls[i * 8 + j].BackgroundImage = null;
+                }
             lblNaPotezu.Text = ((Igra)kontekst.naPotezu).ToString();
         }
 
@@ -179,12 +202,24 @@ namespace ChessTG
             {
                 Koordinate crniKralj = kontekst.NadjiFiguru(Tip.CrniKralj, kontekst);
                 Context.brojPotezaCrnog = kontekst.FinalnaListaMogucihPoteza(kontekst, new Potez(crniKralj.x, crniKralj.y)).Count;
-                Potez p = kontekst.AlphaBeta(kontekst, 6, int.MinValue, int.MaxValue);
+                Potez p = kontekst.AlphaBeta(kontekst, 4, int.MinValue, int.MaxValue);
                 lblPotezi.Text = Context.i.ToString();
 
                 Context.i = 0;
                 Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure, kontekst);
-                kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x,mestoFigureKojaIgra.y),p);
+                Koordinate beliTop = kontekst.NadjiFiguru(Tip.BeliTop, kontekst);
+                Context context = new Context(kontekst);
+                context.UradiPotez(new Potez(mestoFigureKojaIgra.x, mestoFigureKojaIgra.y), p);
+                if (!context.DalijeNapadnut(Tip.BeliTop))
+                    kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x, mestoFigureKojaIgra.y), p);
+                else
+                {
+                    List<Potez> listaFigureKojaIgra = kontekst.FinalnaListaMogucihPoteza(kontekst, new Potez(beliTop.x, beliTop.y));
+                    if (listaFigureKojaIgra.Contains(new Potez(beliTop.x, 0)))
+                         kontekst.UradiPotez(new Potez(beliTop.x, beliTop.y), new Potez(beliTop.x, 0));
+                    else
+                        kontekst.UradiPotez(new Potez(beliTop.x, beliTop.y), new Potez(beliTop.x, 7));
+                }
                 Refresh();
                 label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
                 label3.Text = kontekst.DalijeNapadnut(Tip.BeliTop).ToString();
@@ -193,14 +228,14 @@ namespace ChessTG
                 {
                     if (kontekst.DaLiJeMat())
                         MessageBox.Show("MAT!");
-                    else
+                    else if(kontekst.DaLiJePat())
                         MessageBox.Show("PAT!");
                 }
             }
             else
             {
                 Context.i = 0;
-                Potez p = kontekst.AlphaBeta(kontekst, 6, int.MinValue, int.MaxValue);
+                Potez p = kontekst.AlphaBeta(kontekst, 4, int.MinValue, int.MaxValue);
                 lblPotezi.Text = Context.i.ToString();
                 Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure, kontekst);
                 kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x, mestoFigureKojaIgra.y), p);
@@ -211,7 +246,7 @@ namespace ChessTG
                 {
                     if (kontekst.DaLiJeMat())
                         MessageBox.Show("MAT!");
-                    else
+                    else if(kontekst.DaLiJePat())
                         MessageBox.Show("PAT!");
                 }
             }

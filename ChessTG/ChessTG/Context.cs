@@ -109,8 +109,11 @@ namespace ChessTG
             {
                 case Tip.CrniKralj:     //treba da nadje polja koja napadaju beli kralj i top
 
-                    listaNedozvoljenihPoteza = listaMogucihPoteza(Tip.BeliKralj, new Potez(beliKralj.x, beliKralj.y));
-                    listaNedozvoljenihPoteza.AddRange(listaMogucihPoteza(Tip.BeliTop,new Potez(beliTop.x,beliTop.y)));
+                    List<Potez> listaNedozvoljenihPotezaKralj = new List<Potez>();
+                    List<Potez> listaNedozvoljenihPotezaTop = new List<Potez>();
+                    
+                    listaNedozvoljenihPotezaKralj = listaMogucihPoteza(Tip.BeliKralj, new Potez(beliKralj.x, beliKralj.y));
+                    listaNedozvoljenihPotezaTop = listaMogucihPoteza(Tip.BeliTop,new Potez(beliTop.x,beliTop.y));
 
                     if (beliKralj.x == beliTop.x || beliKralj.y == beliTop.y)
                     {
@@ -131,8 +134,11 @@ namespace ChessTG
                                 for (int i = 7; i >= beliKralj.x; blokiraniPotezi.Add(new Potez(i--, beliKralj.y))) ;
                         }
 
-                        listaNedozvoljenihPoteza = listaNedozvoljenihPoteza.Except(blokiraniPotezi).ToList();
+                        listaNedozvoljenihPotezaTop = listaNedozvoljenihPotezaTop.Except(blokiraniPotezi).ToList();
                     }
+
+                    listaNedozvoljenihPoteza.AddRange(listaNedozvoljenihPotezaKralj);
+                    listaNedozvoljenihPoteza.AddRange(listaNedozvoljenihPotezaTop);
 
                     break;
 
@@ -235,7 +241,8 @@ namespace ChessTG
             Context.i++;
             if (depth == 0 || ctx.DaLiJeKraj())
             {
-                najbolji.Value = ctx.Evaluate(depth - 6);
+                najbolji.Value = ctx.Evaluate(depth-4);
+
                 return najbolji;
             }
             Potez trenutnoMesto;
@@ -311,6 +318,8 @@ namespace ChessTG
         {
             if (naPotezu == (int)Igra.Beli)
             {
+                if (DalijeNapadnut(Tip.BeliTop))
+                    return -1000000;
                 return (heuristic_beli(depth));
             }
             else
@@ -379,7 +388,14 @@ namespace ChessTG
             }
             return false;
         }
+        public bool DaLiJePat()
+        {
 
+            Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, this);
+            if (FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y)).Count == 0)
+                return true;
+            return false;
+        }
         /// <summary>
         /// Da li je kraj igre
         /// </summary>
@@ -428,48 +444,40 @@ namespace ChessTG
         }
         public int heuristic_beli(int dubina)
         {
-          //  if (DalijeNapadnut(Tip.BeliTop))
-           //     return int.MinValue;
             double bonus = 0, penalty = 0;
-            double beliKNapada = 0;
+            double BrojPotezaCrnog = 0;
             Koordinate beliKralj, crniKralj, beliTop;
             beliKralj = NadjiFiguru(Tip.BeliKralj, this);
             crniKralj = NadjiFiguru(Tip.CrniKralj, this);
             beliTop = NadjiFiguru(Tip.BeliTop, this);
-            List<Potez> listaBeliKralj = FinalnaListaMogucihPoteza(this, new Potez(beliKralj.x, beliKralj.y));
-            List<Potez> listaCrniKralj = listaMogucihPoteza(Tip.CrniKralj, new Potez(crniKralj.x, crniKralj.y));
-            foreach(Potez pot in listaBeliKralj)
-            {
-                if (listaCrniKralj.Contains(pot))
-                    beliKNapada++;
-            }
+            List<Potez> listaCrniKralj = FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y));
+            BrojPotezaCrnog = listaCrniKralj.Count;
             double CK_CMD = Context.CMD[crniKralj.x, crniKralj.y]; //central manhattan distance
             double BT_CMD = CMD[beliTop.x, beliTop.y];             //CMD
             if (DaLiJeMat())
                 bonus += 1000 / Math.Abs(dubina)+1;
             else if (DaLiJeKraj())
                 penalty += 1000 / Math.Abs(dubina)+1;
-         //   if (naPotezu == (int)Igra.Crni)
+            if(naPotezu==(int)Igra.Crni)
                 if (DalijeNapadnut(Tip.BeliTop)) 
-                    penalty += 1000;
-                //naredne dve linije bi trebalo da rade isto sto i ove dve gore
-            if (ChebyshevDistance(crniKralj.x, crniKralj.y, beliTop.x, beliTop.y) == 1)
-                penalty += 1000;
+                     penalty += 99999999;
             if (ChebyshevDistance(beliKralj.x, beliKralj.y, crniKralj.x, crniKralj.y) == 2)
                 bonus += 20;
-
+            if (ChebyshevDistance(beliTop.x, beliTop.y, crniKralj.x, crniKralj.y) > 3)
+                bonus += 50;
             //apsolutna razlika izmedju x i y BT i CK, sto vece to bolje, znaci da je kralj vise ranjiv od topa
             double BT_CK_ydiff = Math.Abs(crniKralj.y - beliTop.y);
             double BT_CK_xdiff = Math.Abs(crniKralj.x - beliTop.x);
             double BT_CK_test = (Math.Max(BT_CK_ydiff, BT_CK_xdiff) / (Math.Min(BT_CK_ydiff, BT_CK_xdiff))+1)-1;
             //da li je beliK izmedju topa i crnogK, ako jeste, kazni ga
-            //PROVERI---------------------------------------------------------------------------------------------------------
-            if ((beliTop.y < beliKralj.y && beliKralj.y < crniKralj.y) || (crniKralj.y < beliKralj.y && beliKralj.y < beliTop.y))
-                BT_CK_test = -2 * BT_CK_test;
-            if ((beliTop.x < beliKralj.x && beliKralj.x < crniKralj.x) || (crniKralj.x < beliKralj.x && beliKralj.x < beliTop.x))
-                BT_CK_test = -2 * BT_CK_test;
+            if(beliKralj.y==crniKralj.y&&beliKralj.y==beliTop.y)
+                if ((beliTop.y < beliKralj.y && beliKralj.y < crniKralj.y) || (crniKralj.y < beliKralj.y && beliKralj.y < beliTop.y))
+                    BT_CK_test = -2 * BT_CK_test;
+            if(beliTop.x==beliKralj.x&&beliKralj.x==crniKralj.x)
+                if ((beliTop.x < beliKralj.x && beliKralj.x < crniKralj.x) || (crniKralj.x < beliKralj.x && beliKralj.x < beliTop.x))
+                    BT_CK_test = -2 * BT_CK_test;
             double BK_CK_man = ManhattanDistance(beliKralj.x, beliKralj.y, crniKralj.x, crniKralj.y);
-            double vrati = ((9.7 * CK_CMD + 1.6 * (14 - BK_CK_man) + BT_CK_test - (10 * beliKNapada / (CK_CMD + 1)) + bonus - penalty)*200);
+            double vrati = ((9.7 * CK_CMD + 1.6 * (14 - BK_CK_man) + BT_CK_test - (10 * brojPotezaCrnog / (CK_CMD + 1)) + bonus - penalty)*200);
             return (int)vrati;
 
         }
@@ -481,7 +489,7 @@ namespace ChessTG
             double bonus=0, penalty=0;
             if (DaLiJeMat())
                 penalty += 1000 / Math.Abs(dubina)+1;
-            else if (DaLiJeKraj())
+            else if (DaLiJePat())
                 bonus += 1000 / Math.Abs(dubina)+1;
             if (DalijeNapadnut(Tip.CrniKralj))
                 penalty += 500;
@@ -492,7 +500,7 @@ namespace ChessTG
             int brojPoteza = FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y)).Count;
             int CK_CMD = CMD[crniKralj.x, crniKralj.y];
             double BT_CK_diff = Math.Abs(Math.Abs(crniKralj.y - beliTop.y) - Math.Abs(crniKralj.x - beliTop.x));
-            double vrati = (-9.3 * BT_CK_diff - 5.7 * CK_CMD + (10 * brojPoteza / (CK_CMD + 1)) + penalty - bonus)*200;
+            double vrati = (-9.3 * BT_CK_diff - 5.7 * CK_CMD + (10 *brojPoteza / (CK_CMD + 1)) + penalty - bonus)*200;
             return (int)vrati;
         }
         #endregion
