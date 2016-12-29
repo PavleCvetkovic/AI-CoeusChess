@@ -109,8 +109,11 @@ namespace ChessTG
             {
                 case Tip.CrniKralj:     //treba da nadje polja koja napadaju beli kralj i top
 
-                    listaNedozvoljenihPoteza = listaMogucihPoteza(Tip.BeliKralj, new Potez(beliKralj.x, beliKralj.y));
-                    listaNedozvoljenihPoteza.AddRange(listaMogucihPoteza(Tip.BeliTop,new Potez(beliTop.x,beliTop.y)));
+                    List<Potez> listaNedozvoljenihPotezaKralj = new List<Potez>();
+                    List<Potez> listaNedozvoljenihPotezaTop = new List<Potez>();
+                    
+                    listaNedozvoljenihPotezaKralj = listaMogucihPoteza(Tip.BeliKralj, new Potez(beliKralj.x, beliKralj.y));
+                    listaNedozvoljenihPotezaTop = listaMogucihPoteza(Tip.BeliTop,new Potez(beliTop.x,beliTop.y));
 
                     if (beliKralj.x == beliTop.x || beliKralj.y == beliTop.y)
                     {
@@ -131,8 +134,11 @@ namespace ChessTG
                                 for (int i = 7; i >= beliKralj.x; blokiraniPotezi.Add(new Potez(i--, beliKralj.y))) ;
                         }
 
-                        listaNedozvoljenihPoteza = listaNedozvoljenihPoteza.Except(blokiraniPotezi).ToList();
+                        listaNedozvoljenihPotezaTop = listaNedozvoljenihPotezaTop.Except(blokiraniPotezi).ToList();
                     }
+
+                    listaNedozvoljenihPoteza.AddRange(listaNedozvoljenihPotezaKralj);
+                    listaNedozvoljenihPoteza.AddRange(listaNedozvoljenihPotezaTop);
 
                     break;
 
