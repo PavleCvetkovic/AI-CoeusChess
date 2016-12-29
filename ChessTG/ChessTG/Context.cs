@@ -236,6 +236,7 @@ namespace ChessTG
             if (depth == 0 || ctx.DaLiJeKraj())
             {
                 najbolji.Value = ctx.Evaluate(depth-4);
+
                 return najbolji;
             }
             Potez trenutnoMesto;
@@ -381,7 +382,14 @@ namespace ChessTG
             }
             return false;
         }
+        public bool DaLiJePat()
+        {
 
+            Koordinate crniKralj = NadjiFiguru(Tip.CrniKralj, this);
+            if (FinalnaListaMogucihPoteza(this, new Potez(crniKralj.x, crniKralj.y)).Count == 0)
+                return true;
+            return false;
+        }
         /// <summary>
         /// Da li je kraj igre
         /// </summary>
@@ -449,7 +457,8 @@ namespace ChessTG
                      penalty += 99999999;
             if (ChebyshevDistance(beliKralj.x, beliKralj.y, crniKralj.x, crniKralj.y) == 2)
                 bonus += 20;
-
+            if (ChebyshevDistance(beliTop.x, beliTop.y, crniKralj.x, crniKralj.y) > 3)
+                bonus += 50;
             //apsolutna razlika izmedju x i y BT i CK, sto vece to bolje, znaci da je kralj vise ranjiv od topa
             double BT_CK_ydiff = Math.Abs(crniKralj.y - beliTop.y);
             double BT_CK_xdiff = Math.Abs(crniKralj.x - beliTop.x);
@@ -474,7 +483,7 @@ namespace ChessTG
             double bonus=0, penalty=0;
             if (DaLiJeMat())
                 penalty += 1000 / Math.Abs(dubina)+1;
-            else if (DaLiJeKraj())
+            else if (DaLiJePat())
                 bonus += 1000 / Math.Abs(dubina)+1;
             if (DalijeNapadnut(Tip.CrniKralj))
                 penalty += 500;

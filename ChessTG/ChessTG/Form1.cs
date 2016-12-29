@@ -184,7 +184,19 @@ namespace ChessTG
 
                 Context.i = 0;
                 Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure, kontekst);
-                kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x,mestoFigureKojaIgra.y),p);
+                Koordinate beliTop = kontekst.NadjiFiguru(Tip.BeliTop, kontekst);
+                Context context = new Context(kontekst);
+                context.UradiPotez(new Potez(mestoFigureKojaIgra.x, mestoFigureKojaIgra.y), p);
+                if (!context.DalijeNapadnut(Tip.BeliTop))
+                    kontekst.UradiPotez(new Potez(mestoFigureKojaIgra.x, mestoFigureKojaIgra.y), p);
+                else
+                {
+                    List<Potez> listaFigureKojaIgra = kontekst.FinalnaListaMogucihPoteza(kontekst, new Potez(beliTop.x, beliTop.y));
+                    if (listaFigureKojaIgra.Contains(new Potez(beliTop.x, 0)))
+                         kontekst.UradiPotez(new Potez(beliTop.x, beliTop.y), new Potez(beliTop.x, 0));
+                    else
+                        kontekst.UradiPotez(new Potez(beliTop.x, beliTop.y), new Potez(beliTop.x, 7));
+                }
                 Refresh();
                 label1.Text = kontekst.DalijeNapadnut(Tip.CrniKralj).ToString();
                 label3.Text = kontekst.DalijeNapadnut(Tip.BeliTop).ToString();
@@ -193,7 +205,7 @@ namespace ChessTG
                 {
                     if (kontekst.DaLiJeMat())
                         MessageBox.Show("MAT!");
-                    else
+                    else if(kontekst.DaLiJePat())
                         MessageBox.Show("PAT!");
                 }
             }
@@ -211,7 +223,7 @@ namespace ChessTG
                 {
                     if (kontekst.DaLiJeMat())
                         MessageBox.Show("MAT!");
-                    else
+                    else if(kontekst.DaLiJePat())
                         MessageBox.Show("PAT!");
                 }
             }
