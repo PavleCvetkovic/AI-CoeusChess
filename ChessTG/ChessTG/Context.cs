@@ -36,7 +36,6 @@ namespace ChessTG
         public int naPotezu; 
         public Tabla Stanje;
         public static long i;
-        public static int brojPotezaCrnog=0;
         /*The Center Manhattan-Distance is the Manhattan-Distance or number of orthogonal 
           King moves on the otherwise empty board from any square to the four 
           squares {d4, d5, e4, e5} in the center of the board.*/
@@ -477,7 +476,7 @@ namespace ChessTG
                 if ((beliTop.x < beliKralj.x && beliKralj.x < crniKralj.x) || (crniKralj.x < beliKralj.x && beliKralj.x < beliTop.x))
                     BT_CK_test = -2 * BT_CK_test;
             double BK_CK_man = ManhattanDistance(beliKralj.x, beliKralj.y, crniKralj.x, crniKralj.y);
-            double vrati = ((9.7 * CK_CMD + 1.6 * (14 - BK_CK_man) + BT_CK_test - (10 * brojPotezaCrnog / (CK_CMD + 1)) + bonus - penalty)*200);
+            double vrati = ((9.7 * CK_CMD + 1.6 * (14 - BK_CK_man) + BT_CK_test - (10 * BrojPotezaCrnog / (CK_CMD + 1)) + bonus - penalty)*200);
             return (int)vrati;
 
         }

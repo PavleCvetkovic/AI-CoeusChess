@@ -200,11 +200,8 @@ namespace ChessTG
         private void btnIgraj_Click(object sender, EventArgs e) { 
             if (kontekst.naPotezu == (int)Igra.Beli)
             {
-                Koordinate crniKralj = kontekst.NadjiFiguru(Tip.CrniKralj, kontekst);
-                Context.brojPotezaCrnog = kontekst.FinalnaListaMogucihPoteza(kontekst, new Potez(crniKralj.x, crniKralj.y)).Count;
                 Potez p = kontekst.AlphaBeta(kontekst, 4, int.MinValue, int.MaxValue);
                 lblPotezi.Text = Context.i.ToString();
-
                 Context.i = 0;
                 Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure, kontekst);
                 Koordinate beliTop = kontekst.NadjiFiguru(Tip.BeliTop, kontekst);
