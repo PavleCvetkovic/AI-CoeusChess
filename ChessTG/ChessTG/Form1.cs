@@ -34,6 +34,8 @@ namespace ChessTG
         private void novaIgraToolStripMenuItem_Click(object sender, EventArgs e)
         {
             kontekst = new Context();
+            if(Context.serial)
+                MessageBox.Show("Deserijalizacija transpozicione tabele uspesna!");
             buttons = new Button[8, 8];
             lblNaPotezu.Text = ((Igra)kontekst.naPotezu).ToString();
             btnDodajBelog.Enabled = true;
@@ -72,7 +74,7 @@ namespace ChessTG
                     tableLayoutPanel1.Controls.Add(b, j, i);
                     buttons[i, j] = b;
                 }
-
+            
         }
 
         private void b_Click(object sender, EventArgs e)
@@ -200,11 +202,8 @@ namespace ChessTG
         private void btnIgraj_Click(object sender, EventArgs e) { 
             if (kontekst.naPotezu == (int)Igra.Beli)
             {
-                Koordinate crniKralj = kontekst.NadjiFiguru(Tip.CrniKralj, kontekst);
-                Context.brojPotezaCrnog = kontekst.FinalnaListaMogucihPoteza(kontekst, new Potez(crniKralj.x, crniKralj.y)).Count;
                 Potez p = kontekst.AlphaBeta(kontekst, 4, int.MinValue, int.MaxValue);
                 lblPotezi.Text = Context.i.ToString();
-
                 Context.i = 0;
                 Koordinate mestoFigureKojaIgra = kontekst.NadjiFiguru(p.tipFigure, kontekst);
                 Koordinate beliTop = kontekst.NadjiFiguru(Tip.BeliTop, kontekst);
@@ -230,6 +229,8 @@ namespace ChessTG
                         MessageBox.Show("MAT!");
                     else if(kontekst.DaLiJePat())
                         MessageBox.Show("PAT!");
+                    kontekst.Seralization(Context.transposTable);
+                    MessageBox.Show("Serijalizacija transpozicione tabele uspesna!");
                 }
             }
             else
@@ -248,6 +249,8 @@ namespace ChessTG
                         MessageBox.Show("MAT!");
                     else if(kontekst.DaLiJePat())
                         MessageBox.Show("PAT!");
+                    kontekst.Seralization(Context.transposTable);
+                    MessageBox.Show("Serijalizacija transpozicione tabele uspesna!");
                 }
             }
         }

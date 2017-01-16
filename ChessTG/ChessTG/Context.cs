@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ChessTG
 {
@@ -36,7 +37,9 @@ namespace ChessTG
         public int naPotezu; 
         public Tabla Stanje;
         public static long i;
-        public static int brojPotezaCrnog=0;
+        public static bool serial = false;
+        public static Hashtable transposTable;
+        public static int[,] zTable;
         /*The Center Manhattan-Distance is the Manhattan-Distance or number of orthogonal 
           King moves on the otherwise empty board from any square to the four 
           squares {d4, d5, e4, e5} in the center of the board.*/
@@ -55,14 +58,60 @@ namespace ChessTG
             Stanje = new Tabla();
             naPotezu = 1;
             i = 0;
+            transposTable = new Hashtable();
+            zTable = new int[64, 3];
+            int br = 1;
+            for (int i = 0; i < 64; i++)
+                for (int j = 0; j < 3; j++)
+                {
+                    zTable[i, j] = br;
+                    br++;
+                }
+            if (Deserialization())
+                serial = true;
         }
         public Context(Context c)
         {
             Stanje = new Tabla(c.Stanje);
             naPotezu = c.naPotezu;
-            
-        }
 
+
+        }
+        public int hashFunction()
+        {
+            int h = 0;
+            for (int i = 0; i < 8; i++)
+                for (int j = 0; j < 8; j++)
+                    if (Stanje.matrica[i, j] != 0)
+                        h = ((i+1) * 8 + j+1)*Stanje.matrica[i,j] + naPotezu*5;
+            return h;
+        }
+        public int hash2()
+        {
+            int k;
+            int h = 0;
+            for (int i = 0; i < 8; i++)
+                for (int j = 0; j < 8; j++)
+                {
+                    if (Stanje.matrica[i, j] != 0)
+                    {
+                        k = Stanje.matrica[i, j];
+                        h = h ^ zTable[i, k - 1];
+                    }
+                }
+            return h;
+        }
+        public Hashtable TranspositionTable
+        {
+            get
+            {
+                return transposTable;
+            }
+            set
+            {
+                transposTable = value;
+            }
+        }
         #region Methods
 
         #region ListePoteza
@@ -242,7 +291,6 @@ namespace ChessTG
             if (depth == 0 || ctx.DaLiJeKraj())
             {
                 najbolji.Value = ctx.Evaluate(depth-4);
-
                 return najbolji;
             }
             Potez trenutnoMesto;
@@ -274,6 +322,12 @@ namespace ChessTG
                     trenutnoMesto = new Potez(trenutneKoordinate.x, trenutneKoordinate.y);
                     Context zaProsledjivanje = new Context(ctx);
                     zaProsledjivanje.UradiPotez(trenutnoMesto,pot);
+                    if (transposTable.Contains(zaProsledjivanje.hashFunction() + zaProsledjivanje.hash2() + zaProsledjivanje.GetHashCode()))
+                    {
+                        int hash = (int)transposTable[zaProsledjivanje.hashFunction() + zaProsledjivanje.hash2() + zaProsledjivanje.GetHashCode()];
+                        najbolji.Value = hash;
+                        return najbolji;
+                    }
                     pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta);
                     if (v < pom.Value)
                     {
@@ -285,7 +339,9 @@ namespace ChessTG
                     if (beta <= alpha)
                         break;
                 }
-
+                if(!transposTable.Contains(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode()))
+                    transposTable.Add(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode(), najbolji.Value);
+                return najbolji;
             }
             else
             {
@@ -296,6 +352,12 @@ namespace ChessTG
                     trenutnoMesto = new Potez(trenutneKoordinate.x, trenutneKoordinate.y);
                     Context zaProsledjivanje = new Context(ctx);
                     zaProsledjivanje.UradiPotez(trenutnoMesto,pot);
+                    if (transposTable.Contains(zaProsledjivanje.hashFunction() + zaProsledjivanje.hash2() + zaProsledjivanje.GetHashCode()))
+                    {
+                        int hash = (int)transposTable[zaProsledjivanje.hashFunction() + zaProsledjivanje.hash2() + zaProsledjivanje.GetHashCode()];
+                        najbolji.Value = hash;
+                        return najbolji;
+                    }
                     pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta);
                     if (v > pom.Value)
                     {
@@ -309,9 +371,10 @@ namespace ChessTG
                         break;
                     }
                 }
+                 if(!transposTable.Contains(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode()))
+                    transposTable.Add(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode(), najbolji.Value);
+                return najbolji;
             }
-
-            return najbolji;
         }
        
         public int Evaluate(int depth)
@@ -477,7 +540,7 @@ namespace ChessTG
                 if ((beliTop.x < beliKralj.x && beliKralj.x < crniKralj.x) || (crniKralj.x < beliKralj.x && beliKralj.x < beliTop.x))
                     BT_CK_test = -2 * BT_CK_test;
             double BK_CK_man = ManhattanDistance(beliKralj.x, beliKralj.y, crniKralj.x, crniKralj.y);
-            double vrati = ((9.7 * CK_CMD + 1.6 * (14 - BK_CK_man) + BT_CK_test - (10 * brojPotezaCrnog / (CK_CMD + 1)) + bonus - penalty)*200);
+            double vrati = ((9.7 * CK_CMD + 1.6 * (14 - BK_CK_man) + BT_CK_test - (10 * BrojPotezaCrnog / (CK_CMD + 1)) + bonus - penalty)*200);
             return (int)vrati;
 
         }
@@ -504,5 +567,40 @@ namespace ChessTG
             return (int)vrati;
         }
         #endregion
+        public bool Seralization(Hashtable tratab)
+        {
+            try
+            {
+                if (tratab != null)
+                {
+                    Stream s = File.Open("transpositionTable.bin", FileMode.Create, FileAccess.ReadWrite);
+                    BinaryFormatter b = new BinaryFormatter();
+                    b.Serialize(s, tratab);
+                    s.Close();
+                }
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+        }
+        public bool Deserialization()
+        {
+            try
+            {
+                Stream s = File.Open("transpositionTable.bin", FileMode.Open, FileAccess.Read);
+                BinaryFormatter b = new BinaryFormatter();
+                if (s.Length != 0)
+                {
+                    transposTable = (Hashtable)b.Deserialize(s);
+                }
+                return true;
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+        }
     }
 }

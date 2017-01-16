@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ChessTG
 {
+    [Serializable]
     public class Potez
     {
         #region Attributes
