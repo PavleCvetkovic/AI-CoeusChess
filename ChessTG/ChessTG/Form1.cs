@@ -227,6 +227,7 @@ namespace ChessTG
                         MessageBox.Show("MAT!");
                     else if(kontekst.DaLiJePat())
                         MessageBox.Show("PAT!");
+                    kontekst.Seralization(Context.transposTable);
                 }
             }
             else
@@ -245,6 +246,7 @@ namespace ChessTG
                         MessageBox.Show("MAT!");
                     else if(kontekst.DaLiJePat())
                         MessageBox.Show("PAT!");
+                    kontekst.Seralization(Context.transposTable);
                 }
             }
         }

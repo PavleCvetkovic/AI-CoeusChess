@@ -66,6 +66,7 @@ namespace ChessTG
                     zTable[i, j] = br;
                     br++;
                 }
+            Deserialization();
         }
         public Context(Context c)
         {
@@ -285,13 +286,9 @@ namespace ChessTG
             Potez najbolji = new Potez(); //ovaj potez vraca funkcija
             Potez pom = new Potez();
             Context.i++;
-            if (transposTable.Contains(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode()))
-                return (Potez)transposTable[ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode()];
-                
             if (depth == 0 || ctx.DaLiJeKraj())
             {
                 najbolji.Value = ctx.Evaluate(depth-4);
-                transposTable.Add(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode(), najbolji);
                 return najbolji;
             }
             Potez trenutnoMesto;
@@ -323,6 +320,12 @@ namespace ChessTG
                     trenutnoMesto = new Potez(trenutneKoordinate.x, trenutneKoordinate.y);
                     Context zaProsledjivanje = new Context(ctx);
                     zaProsledjivanje.UradiPotez(trenutnoMesto,pot);
+                    if (transposTable.Contains(zaProsledjivanje.hashFunction() + zaProsledjivanje.hash2() + zaProsledjivanje.GetHashCode()))
+                    {
+                        int hash = (int)transposTable[zaProsledjivanje.hashFunction() + zaProsledjivanje.hash2() + zaProsledjivanje.GetHashCode()];
+                        najbolji.Value = hash;
+                        return najbolji;
+                    }
                     pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta);
                     if (v < pom.Value)
                     {
@@ -334,7 +337,8 @@ namespace ChessTG
                     if (beta <= alpha)
                         break;
                 }
-               // transposTable.Add(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode(), najbolji);
+                if(!transposTable.Contains(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode()))
+                    transposTable.Add(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode(), najbolji.Value);
                 return najbolji;
             }
             else
@@ -346,6 +350,12 @@ namespace ChessTG
                     trenutnoMesto = new Potez(trenutneKoordinate.x, trenutneKoordinate.y);
                     Context zaProsledjivanje = new Context(ctx);
                     zaProsledjivanje.UradiPotez(trenutnoMesto,pot);
+                    if (transposTable.Contains(zaProsledjivanje.hashFunction() + zaProsledjivanje.hash2() + zaProsledjivanje.GetHashCode()))
+                    {
+                        int hash = (int)transposTable[zaProsledjivanje.hashFunction() + zaProsledjivanje.hash2() + zaProsledjivanje.GetHashCode()];
+                        najbolji.Value = hash;
+                        return najbolji;
+                    }
                     pom = AlphaBeta(zaProsledjivanje, depth - 1, alpha, beta);
                     if (v > pom.Value)
                     {
@@ -359,7 +369,8 @@ namespace ChessTG
                         break;
                     }
                 }
-               // transposTable.Add(ctx.hashFunction()+ctx.hash2()+ctx.GetHashCode(), najbolji);
+                 if(!transposTable.Contains(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode()))
+                    transposTable.Add(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode(), najbolji.Value);
                 return najbolji;
             }
         }
@@ -554,13 +565,13 @@ namespace ChessTG
             return (int)vrati;
         }
         #endregion
-        public void Seralization()
+        public void Seralization(Hashtable tratab)
         {
-            if (transposTable != null)
+            if (tratab != null)
             {
                 Stream s = File.Open("transpositionTable.bin", FileMode.Create, FileAccess.ReadWrite);
                 BinaryFormatter b = new BinaryFormatter();
-                b.Serialize(s, transposTable);
+                b.Serialize(s, tratab);
                 s.Close();
             }
         }
