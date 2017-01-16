@@ -34,6 +34,8 @@ namespace ChessTG
         private void novaIgraToolStripMenuItem_Click(object sender, EventArgs e)
         {
             kontekst = new Context();
+            if(Context.serial)
+                MessageBox.Show("Deserijalizacija transpozicione tabele uspesna!");
             buttons = new Button[8, 8];
             lblNaPotezu.Text = ((Igra)kontekst.naPotezu).ToString();
             btnDodajBelog.Enabled = true;
@@ -72,7 +74,7 @@ namespace ChessTG
                     tableLayoutPanel1.Controls.Add(b, j, i);
                     buttons[i, j] = b;
                 }
-
+            
         }
 
         private void b_Click(object sender, EventArgs e)
@@ -228,6 +230,7 @@ namespace ChessTG
                     else if(kontekst.DaLiJePat())
                         MessageBox.Show("PAT!");
                     kontekst.Seralization(Context.transposTable);
+                    MessageBox.Show("Serijalizacija transpozicione tabele uspesna!");
                 }
             }
             else
@@ -247,6 +250,7 @@ namespace ChessTG
                     else if(kontekst.DaLiJePat())
                         MessageBox.Show("PAT!");
                     kontekst.Seralization(Context.transposTable);
+                    MessageBox.Show("Serijalizacija transpozicione tabele uspesna!");
                 }
             }
         }

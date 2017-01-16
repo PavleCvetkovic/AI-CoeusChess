@@ -37,6 +37,7 @@ namespace ChessTG
         public int naPotezu; 
         public Tabla Stanje;
         public static long i;
+        public static bool serial = false;
         public static Hashtable transposTable;
         public static int[,] zTable;
         /*The Center Manhattan-Distance is the Manhattan-Distance or number of orthogonal 
@@ -66,7 +67,8 @@ namespace ChessTG
                     zTable[i, j] = br;
                     br++;
                 }
-            Deserialization();
+            if (Deserialization())
+                serial = true;
         }
         public Context(Context c)
         {
@@ -565,17 +567,25 @@ namespace ChessTG
             return (int)vrati;
         }
         #endregion
-        public void Seralization(Hashtable tratab)
+        public bool Seralization(Hashtable tratab)
         {
-            if (tratab != null)
+            try
             {
-                Stream s = File.Open("transpositionTable.bin", FileMode.Create, FileAccess.ReadWrite);
-                BinaryFormatter b = new BinaryFormatter();
-                b.Serialize(s, tratab);
-                s.Close();
+                if (tratab != null)
+                {
+                    Stream s = File.Open("transpositionTable.bin", FileMode.Create, FileAccess.ReadWrite);
+                    BinaryFormatter b = new BinaryFormatter();
+                    b.Serialize(s, tratab);
+                    s.Close();
+                }
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
             }
         }
-        public void Deserialization()
+        public bool Deserialization()
         {
             try
             {
@@ -585,11 +595,11 @@ namespace ChessTG
                 {
                     transposTable = (Hashtable)b.Deserialize(s);
                 }
-
+                return true;
             }
             catch (IOException)
             {
-
+                return false;
             }
         }
     }
