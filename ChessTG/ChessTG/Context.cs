@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ChessTG
 {
@@ -36,6 +37,8 @@ namespace ChessTG
         public int naPotezu; 
         public Tabla Stanje;
         public static long i;
+        public static Hashtable transposTable;
+        public static int[,] zTable;
         /*The Center Manhattan-Distance is the Manhattan-Distance or number of orthogonal 
           King moves on the otherwise empty board from any square to the four 
           squares {d4, d5, e4, e5} in the center of the board.*/
@@ -54,14 +57,58 @@ namespace ChessTG
             Stanje = new Tabla();
             naPotezu = 1;
             i = 0;
+            transposTable = new Hashtable();
+            zTable = new int[64, 3];
+            int br = 1;
+            for (int i = 0; i < 64; i++)
+                for (int j = 0; j < 3; j++)
+                {
+                    zTable[i, j] = br;
+                    br++;
+                }
         }
         public Context(Context c)
         {
             Stanje = new Tabla(c.Stanje);
             naPotezu = c.naPotezu;
-            
-        }
 
+
+        }
+        public int hashFunction()
+        {
+            int h = 0;
+            for (int i = 0; i < 8; i++)
+                for (int j = 0; j < 8; j++)
+                    if (Stanje.matrica[i, j] != 0)
+                        h = ((i+1) * 8 + j+1)*Stanje.matrica[i,j] + naPotezu*5;
+            return h;
+        }
+        public int hash2()
+        {
+            int k;
+            int h = 0;
+            for (int i = 0; i < 8; i++)
+                for (int j = 0; j < 8; j++)
+                {
+                    if (Stanje.matrica[i, j] != 0)
+                    {
+                        k = Stanje.matrica[i, j];
+                        h = h ^ zTable[i, k - 1];
+                    }
+                }
+            return h;
+        }
+        public Hashtable TranspositionTable
+        {
+            get
+            {
+                return transposTable;
+            }
+            set
+            {
+                transposTable = value;
+            }
+        }
         #region Methods
 
         #region ListePoteza
@@ -238,10 +285,13 @@ namespace ChessTG
             Potez najbolji = new Potez(); //ovaj potez vraca funkcija
             Potez pom = new Potez();
             Context.i++;
+            if (transposTable.Contains(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode()))
+                return (Potez)transposTable[ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode()];
+                
             if (depth == 0 || ctx.DaLiJeKraj())
             {
                 najbolji.Value = ctx.Evaluate(depth-4);
-
+                transposTable.Add(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode(), najbolji);
                 return najbolji;
             }
             Potez trenutnoMesto;
@@ -284,7 +334,8 @@ namespace ChessTG
                     if (beta <= alpha)
                         break;
                 }
-
+               // transposTable.Add(ctx.hashFunction() + ctx.hash2() + ctx.GetHashCode(), najbolji);
+                return najbolji;
             }
             else
             {
@@ -308,9 +359,9 @@ namespace ChessTG
                         break;
                     }
                 }
+               // transposTable.Add(ctx.hashFunction()+ctx.hash2()+ctx.GetHashCode(), najbolji);
+                return najbolji;
             }
-
-            return najbolji;
         }
        
         public int Evaluate(int depth)
@@ -503,5 +554,32 @@ namespace ChessTG
             return (int)vrati;
         }
         #endregion
+        public void Seralization()
+        {
+            if (transposTable != null)
+            {
+                Stream s = File.Open("transpositionTable.bin", FileMode.Create, FileAccess.ReadWrite);
+                BinaryFormatter b = new BinaryFormatter();
+                b.Serialize(s, transposTable);
+                s.Close();
+            }
+        }
+        public void Deserialization()
+        {
+            try
+            {
+                Stream s = File.Open("transpositionTable.bin", FileMode.Open, FileAccess.Read);
+                BinaryFormatter b = new BinaryFormatter();
+                if (s.Length != 0)
+                {
+                    transposTable = (Hashtable)b.Deserialize(s);
+                }
+
+            }
+            catch (IOException)
+            {
+
+            }
+        }
     }
 }
