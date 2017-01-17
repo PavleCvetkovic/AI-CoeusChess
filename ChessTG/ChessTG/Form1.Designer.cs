@@ -40,6 +40,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -119,7 +121,7 @@
             // lblNaPotezu
             // 
             this.lblNaPotezu.AutoSize = true;
-            this.lblNaPotezu.Location = new System.Drawing.Point(555, 217);
+            this.lblNaPotezu.Location = new System.Drawing.Point(632, 257);
             this.lblNaPotezu.Name = "lblNaPotezu";
             this.lblNaPotezu.Size = new System.Drawing.Size(35, 13);
             this.lblNaPotezu.TabIndex = 5;
@@ -138,11 +140,10 @@
             // lblPotezi
             // 
             this.lblPotezi.AutoSize = true;
-            this.lblPotezi.Location = new System.Drawing.Point(555, 234);
+            this.lblPotezi.Location = new System.Drawing.Point(632, 282);
             this.lblPotezi.Name = "lblPotezi";
-            this.lblPotezi.Size = new System.Drawing.Size(35, 13);
+            this.lblPotezi.Size = new System.Drawing.Size(0, 13);
             this.lblPotezi.TabIndex = 7;
-            this.lblPotezi.Text = "label1";
             // 
             // label1
             // 
@@ -155,7 +156,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(539, 310);
+            this.label2.Location = new System.Drawing.Point(514, 311);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(76, 13);
             this.label2.TabIndex = 9;
@@ -169,12 +170,33 @@
             this.label3.Size = new System.Drawing.Size(35, 13);
             this.label3.TabIndex = 10;
             this.label3.Text = "label3";
+            this.label3.Visible = false;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(514, 257);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(59, 13);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "Na potezu:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(514, 282);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(115, 13);
+            this.label5.TabIndex = 12;
+            this.label5.Text = "Broj obradjenih poteza:";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(702, 591);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -210,6 +232,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
     }
 }
 
