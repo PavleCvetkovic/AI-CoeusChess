@@ -1,2 +1,3 @@
 # CoeusChess
-Matiranje kralja topom i kraljem (GAME THEORY, leta Gospodnjeg 2016)
+Student project for GameTheory class.
+Matiranje kralja topom i kraljem.
